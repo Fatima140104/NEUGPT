@@ -31,6 +31,7 @@ Tạo file `.env` dựa trên file mẫu `.env.example`:
 ```
 PORT=3000
 NODE_ENV=development
+OPENAI_API_KEY=
 ```
 
 ## Thư mục chính
