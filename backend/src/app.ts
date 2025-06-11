@@ -1,20 +1,29 @@
-import express from 'express';
-import itemRoutes from './routes/itemRoutes';
-import { errorHandler } from './middlewares/errorHandler';
+import express from "express";
+import itemRoutes from "./routes/itemRoutes";
+import { errorHandler } from "./middlewares/errorHandler";
+import cors from "cors";
+import morgan from "morgan";
+import userRoutes from "./routes/userRoutes";
+import sessionRoutes from "./routes/sessionRoutes";
+import chatRoutes from "./routes/chatRoutes";
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors());
+app.use(morgan("dev"));
 
 // Define routes
-app.use('/api/items', itemRoutes);
+app.use("/api/items", itemRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/sessions", sessionRoutes);
+app.use("/api/chats", chatRoutes);
 
 app.use(errorHandler);
 
-app.get('/', (req, res) => {
-    res.send('Welcome to the Express API!');
-}
-);
+app.get("/", (req, res) => {
+  res.send("Welcome to the Express API!");
+});
 
 export default app;
