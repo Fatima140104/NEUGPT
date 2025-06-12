@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
-    <diagram id="mVAerTTl7Mklbj6YtLH9" name="Page-1">
-        <mxGraphModel dx="940" dy="611" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <diagram id="mVAerTTl7Mklbj6YtLH9" name="system design">
+        <mxGraphModel dx="1033" dy="615" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -49,16 +49,38 @@
                 <mxCell id="17" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;Authentication&lt;/font&gt;" style="sketch=0;verticalLabelPosition=bottom;sketch=0;aspect=fixed;html=1;verticalAlign=top;strokeColor=none;fillColor=#000000;align=center;outlineConnect=0;pointerEvents=1;shape=mxgraph.citrix2.authentication_saml;" parent="1" vertex="1">
                     <mxGeometry x="50" y="540" width="60" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="c4BtpBO1RIPrJIslAZP3-20" value="" style="endArrow=classic;startArrow=classic;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="4" target="5">
+                <mxCell id="c4BtpBO1RIPrJIslAZP3-20" value="" style="endArrow=classic;startArrow=classic;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="4" target="5" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
                         <mxPoint x="400" y="570" as="sourcePoint"/>
                         <mxPoint x="450" y="520" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="c4BtpBO1RIPrJIslAZP3-21" value="REST" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="c4BtpBO1RIPrJIslAZP3-20">
+                <mxCell id="c4BtpBO1RIPrJIslAZP3-21" value="REST" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="c4BtpBO1RIPrJIslAZP3-20" vertex="1" connectable="0">
                     <mxGeometry x="-0.2141" y="1" relative="1" as="geometry">
                         <mxPoint x="13" y="-9" as="offset"/>
                     </mxGeometry>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="VMktLbtPsbpl-tSqzqcM" name="sequence diagram">
+        <mxGraphModel dx="1187" dy="1118" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="3hdtrWZ1ibukUWiqIfno-1" value="sequenceDiagram&#xa;participant User as User (Browser)&#xa;participant FE as Frontend (React)&#xa;participant BE as Backend (Express API)&#xa;participant DB as Database&#xa;participant AI as LLM API&#xa;&#xa;User-&gt;&gt;FE: Mở web, đăng nhập&#xa;FE-&gt;&gt;BE: POST /api/users (register/login)&#xa;BE-&gt;&gt;DB: Tạo/xác thực user&#xa;DB--&gt;&gt;BE: Thông tin user&#xa;BE--&gt;&gt;FE: Auth/session token&#xa;FE-&gt;&gt;BE: GET /api/sessions (tải chat sessions)&#xa;BE-&gt;&gt;DB: Query sessions&#xa;DB--&gt;&gt;BE: Danh sách session&#xa;BE--&gt;&gt;FE: Thông tin session&#xa;User-&gt;&gt;FE: Chọn/bắt đầu session&#xa;FE-&gt;&gt;BE: GET /api/chats (tải lịch sử chat)&#xa;BE-&gt;&gt;DB: Query chats&#xa;DB--&gt;&gt;BE: Lịch sử chat&#xa;BE--&gt;&gt;FE: Thông tin chat&#xa;User-&gt;&gt;User: Chọn model, chức năng (tìm kiếm)&#xa;User-&gt;&gt;FE: Gửi tin nhắn&#xa;FE-&gt;&gt;BE: POST /api/ai/chat {message, sessionId}&#xa;BE-&gt;&gt;AI: POST /v1/chat/completions&#xa;AI--&gt;&gt;BE: Câu trả lời AI&#xa;BE-&gt;&gt;DB: Lưu tin nhắn chat&#xa;DB--&gt;&gt;BE: Xác nhận&#xa;BE--&gt;&gt;FE: Câu trả lời AI&#xa;FE--&gt;&gt;User: Hiển thị câu trả lời AI&#xa;" style="shadow=0;dashed=0;align=left;strokeWidth=1;shape=mxgraph.mermaid.abstract.mermaid;labelBackgroundColor=#ffffff;noLabel=1;theme=default;" vertex="1" parent="1">
+                    <mxGeometry x="40" y="120" width="760" height="770" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="Lqrq4UHeHSy6QoDn9DWi" name="erd">
+        <mxGraphModel dx="2065" dy="724" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="yA_4KRyPY48T2gEEvp_o-1" value="erDiagram&#xa;  USER {&#xa;    string provider&#xa;    string providerId&#xa;    string email&#xa;    string displayName&#xa;    string avatar&#xa;    date createdAt&#xa;    date updatedAt&#xa;  }&#xa;  SESSION {&#xa;    string title&#xa;    date createdAt&#xa;    date updatedAt&#xa;  }&#xa;  CHAT {&#xa;    string role&#xa;    string content&#xa;    date timestamp&#xa;  }&#xa;&#xa;  USER ||--o{ SESSION : has&#xa;  SESSION ||--o{ CHAT : has&#xa;  USER ||--o{ CHAT : sends&#xa;" style="shadow=0;dashed=0;align=left;strokeWidth=1;shape=mxgraph.mermaid.abstract.mermaid;labelBackgroundColor=#ffffff;noLabel=1;theme=default;" vertex="1" parent="1">
+                    <mxGeometry x="-760" y="170" width="580" height="840" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>

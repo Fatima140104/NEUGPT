@@ -6,6 +6,7 @@ import morgan from "morgan";
 import userRoutes from "./routes/userRoutes";
 import sessionRoutes from "./routes/sessionRoutes";
 import chatRoutes from "./routes/chatRoutes";
+import aiRoutes from "./routes/aiRoutes";
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use("/api/items", itemRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/sessions", sessionRoutes);
 app.use("/api/chats", chatRoutes);
+app.use("/api/ai", aiRoutes);
 
 app.use(errorHandler);
 
