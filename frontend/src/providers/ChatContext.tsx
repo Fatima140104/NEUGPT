@@ -12,18 +12,20 @@ interface ChatState {
   messages: Message[];
   currentConversationId: string | null;
   isLoading: boolean;
+  selectedChat?: string | null;
 }
 
 type ChatAction =
   | { type: "ADD_MESSAGE"; payload: Message }
-  | { type: "SET_CONVERSATION"; payload: string }
   | { type: "SET_LOADING"; payload: boolean }
-  | { type: "CLEAR_MESSAGES" };
+  | { type: "CLEAR_MESSAGES" }
+  | { type: "SET_MESSAGES"; payload: Message[] };
 
 const initialState: ChatState = {
   messages: [],
   currentConversationId: null,
   isLoading: false,
+  selectedChat: null,
 };
 
 const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
@@ -33,11 +35,12 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         ...state,
         messages: [...state.messages, action.payload],
       };
-    case "SET_CONVERSATION":
+    case "SET_MESSAGES":
       return {
         ...state,
-        currentConversationId: action.payload,
+        messages: action.payload,
       };
+
     case "SET_LOADING":
       return {
         ...state,

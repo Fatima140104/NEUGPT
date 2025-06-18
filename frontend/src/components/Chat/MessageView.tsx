@@ -46,7 +46,16 @@ export const MessageView: React.FC = () => {
       ) : (
         <div className="space-y-4">
           {messages.map((message) => (
-            <MessageItem key={message.id} message={message} />
+            <MessageItem
+              key={(message as any)._id || message.id}
+              message={{
+                ...message,
+                timestamp:
+                  message.timestamp instanceof Date
+                    ? message.timestamp
+                    : new Date(message.timestamp),
+              }}
+            />
           ))}
           {isLoading && (
             <div className="flex gap-4 p-4 bg-muted/50">

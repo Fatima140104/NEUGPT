@@ -5,7 +5,6 @@ import {
   getSessionById,
   updateSession,
   deleteSession,
-  getSessionsByUser,
 } from "../controllers/sessionController";
 
 const router = Router();
@@ -17,7 +16,6 @@ function asyncHandler(fn: any) {
 
 router.get("/", asyncHandler(getSessions));
 router.get("/:id", asyncHandler(getSessionById));
-router.get("/user/:userId", asyncHandler(getSessionsByUser));
 router.post("/", asyncHandler(createSession));
 router.put("/:id", asyncHandler(updateSession));
 router.delete("/:id", asyncHandler(deleteSession));

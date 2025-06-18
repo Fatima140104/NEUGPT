@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useChat } from "../../providers/ChatContext";
+import { useChatSession } from "../../providers/ChatSessionContext";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Paperclip, Settings2, Mic } from "lucide-react";
@@ -8,38 +9,60 @@ export const ChatForm: React.FC = () => {
   const [message, setMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { state, dispatch } = useChat();
+  const { state: sessionState, addSession, selectSession } = useChatSession();
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim() || state.isLoading) return;
 
-    const userMessage = {
-      id: Date.now().toString(),
-      role: "user" as const,
-      content: message.trim(),
-      timestamp: new Date(),
-    };
-
-    dispatch({ type: "ADD_MESSAGE", payload: userMessage });
-    dispatch({ type: "SET_LOADING", payload: true });
-    setMessage("");
+    let currentSessionId = sessionState.selectedSessionId;
 
     try {
-      // TODO: Implement API call to your backend
-      // For now, we'll simulate a response
-      setTimeout(() => {
-        const aiMessage = {
-          id: (Date.now() + 1).toString(),
-          role: "assistant" as const,
-          content:
-            "This is a simulated response. Implement your API call here.",
-          timestamp: new Date(),
-        };
-        dispatch({ type: "ADD_MESSAGE", payload: aiMessage });
-        dispatch({ type: "SET_LOADING", payload: false });
-      }, 1000);
-    } catch (error) {
-      console.error("Error sending message:", error);
+      // Nếu không có session ID, hãy tạo một session mới và lấy ID của nó
+      if (!currentSessionId) {
+        const newSession = await addSession("Cuộc trò chuyện mới");
+        if (!newSession || !newSession._id) {
+          throw new Error("Không thể tạo hoặc lấy ID của cuộc trò chuyện mới.");
+        }
+        currentSessionId = newSession._id; // Lấy ID từ session vừa được tạo
+        if (typeof currentSessionId === "string") {
+          selectSession(currentSessionId); // Chọn session mới này làm session hiện tại
+        }
+      }
+
+      setError(null);
+      const userMessage = {
+        id: Date.now().toString(),
+        role: "user" as const,
+        content: message.trim(),
+        timestamp: new Date(),
+      };
+
+      dispatch({ type: "ADD_MESSAGE", payload: userMessage });
+      dispatch({ type: "SET_LOADING", payload: true });
+      setMessage("");
+
+      // Gửi tin nhắn đến server với session ID
+      const res = await fetch("/api/ai/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId: currentSessionId,
+          message: userMessage.content,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Gửi tin nhắn thất bại");
+
+      // Tải lại tin nhắn cho session hiện tại
+      const fetchRes = await fetch(`/api/chats/session/${currentSessionId}`);
+      if (!fetchRes.ok) throw new Error("Không thể tải lại tin nhắn");
+      const messages = await fetchRes.json();
+      dispatch({ type: "SET_MESSAGES", payload: messages });
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
       dispatch({ type: "SET_LOADING", payload: false });
     }
   };
@@ -91,6 +114,7 @@ export const ChatForm: React.FC = () => {
                 <Send className="h-5 w-5" />
               </Button>
             </div>
+            {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
           </div>
         </div>
         {/* Tools/Actions Section */}
