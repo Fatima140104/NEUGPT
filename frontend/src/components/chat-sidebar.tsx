@@ -58,7 +58,7 @@ function ChatSidebar() {
       <SidebarHeader className="border-b p-4">
         <div className="flex items-center gap-2 mb-4">
           <MessageSquare className="h-6 w-6" />
-          <span className="font-semibold text-lg">AI Chat</span>
+          <span className="font-semibold text-lg">NEU GPT</span>
         </div>
         <Button
           className="w-full justify-start gap-2"

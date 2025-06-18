@@ -50,14 +50,14 @@ export const ChatView: React.FC = () => {
   }
   if (messages.length === 0) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center h-full">
+      <div className="flex flex-1 flex-col items-center justify-center h-full relative">
         <div className="mb-8 text-center">
           <h2 className="text-3xl font-bold mb-2">What's up Homie?</h2>
           <p className="text-muted-foreground text-base">
             Tôi có thể giúp gì cho bạn?
           </p>
         </div>
-        <div className="w-full flex justify-center">
+        <div className="w-full flex justify-center bg-transparent">
           <ChatForm />
         </div>
       </div>
@@ -65,11 +65,17 @@ export const ChatView: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto">
-        <MessageView />
+    <div className="relative flex-1 h-full">
+      <div className="absolute inset-0 flex flex-col">
+        <div className="flex-1 overflow-y-auto pb-36">
+          <div className="w-full max-w-3xl mx-auto flex items-center justify-center">
+            <MessageView />
+          </div>
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 z-10 bg-transparent flex justify-center">
+          <ChatForm />
+        </div>
       </div>
-      <ChatForm />
     </div>
   );
 };
