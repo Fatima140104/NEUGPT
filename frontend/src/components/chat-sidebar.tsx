@@ -11,6 +11,7 @@ import {
   Edit3,
   Trash2,
   Archive,
+  Share,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -43,6 +44,12 @@ import { useChatSession } from "../providers/ChatSessionContext";
 function ChatSidebar() {
   const { state, selectSession, addSession } = useChatSession();
   const [searchQuery, setSearchQuery] = React.useState("");
+  const [hoveredSessionId, setHoveredSessionId] = React.useState<string | null>(
+    null
+  );
+  const [menuOpenSessionId, setMenuOpenSessionId] = React.useState<
+    string | null
+  >(null);
 
   const filteredSessions = (state.sessions || [])
     .sort(
@@ -99,11 +106,15 @@ function ChatSidebar() {
                 </div>
               )}
               {filteredSessions.map((session) => (
-                <SidebarMenuItem key={session._id}>
+                <SidebarMenuItem
+                  key={session._id}
+                  className="group"
+                  onMouseEnter={() => setHoveredSessionId(session._id)}
+                >
                   <SidebarMenuButton
                     asChild
                     isActive={state.selectedSessionId === session._id}
-                    className="h-auto p-3 flex-col items-start"
+                    className="h-auto p-3  items-start"
                   >
                     <button
                       onClick={() => selectSession(session._id)}
@@ -113,6 +124,43 @@ function ChatSidebar() {
                         <span className="font-medium text-sm truncate flex-1">
                           {session.title || "(Không có tiêu đề)"}
                         </span>
+
+                        {hoveredSessionId === session._id && (
+                          <DropdownMenu
+                            open={menuOpenSessionId === session._id}
+                            onOpenChange={(open) =>
+                              setMenuOpenSessionId(open ? session._id : null)
+                            }
+                          >
+                            <DropdownMenuTrigger asChild>
+                              <span>
+                                <MoreHorizontal
+                                  className="opacity-50 transition-opacity duration-200 ml-1 cursor-pointer"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setMenuOpenSessionId(session._id);
+                                  }}
+                                />
+                              </span>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="start">
+                              <DropdownMenuItem>
+                                <Share className="h-5 w-5 mr-2" /> Chia sẻ
+                              </DropdownMenuItem>
+                              <DropdownMenuItem>
+                                <Edit3 className="h-5 w-5 mr-2" /> Đổi tên
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem>
+                                <Archive className="h-5 w-5 mr-2" /> Lưu trữ
+                              </DropdownMenuItem>
+                              <DropdownMenuItem>
+                                <Trash2 className="h-5 w-5 mr-2 text-red-500" />{" "}
+                                Xóa
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        )}
                         {/* TODO: Thêm ngày tạo */}
                         {/* {<span className="text-xs text-muted-foreground ml-2">
                           {new Date(session.timestamp).toLocaleString()}

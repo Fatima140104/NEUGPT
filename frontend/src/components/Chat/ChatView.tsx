@@ -34,20 +34,6 @@ export const ChatView: React.FC = () => {
       });
   }, [sessionState.selectedSessionId, dispatch]);
 
-  if (loading) {
-    return (
-      <div className="flex flex-1 flex-col items-center justify-center h-full text-muted-foreground">
-        Đang tải tin nhắn...
-      </div>
-    );
-  }
-  if (error) {
-    return (
-      <div className="flex flex-1 flex-col items-center justify-center h-full text-red-500">
-        {error}
-      </div>
-    );
-  }
   if (messages.length === 0) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center h-full relative">
@@ -69,7 +55,17 @@ export const ChatView: React.FC = () => {
       <div className="absolute inset-0 flex flex-col">
         <div className="flex-1 overflow-y-auto pb-36">
           <div className="w-full max-w-3xl mx-auto flex items-center justify-center">
-            <MessageView />
+            {loading ? (
+              <div className="flex flex-1 flex-col items-center justify-center h-full text-muted-foreground">
+                Đang tải tin nhắn...
+              </div>
+            ) : error ? (
+              <div className="flex flex-1 flex-col items-center justify-center h-full text-red-500">
+                {error}
+              </div>
+            ) : (
+              <MessageView />
+            )}
           </div>
         </div>
         <div className="absolute bottom-0 left-0 right-0 z-10 bg-transparent flex justify-center">
