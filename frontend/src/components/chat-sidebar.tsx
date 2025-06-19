@@ -41,11 +41,11 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useChatSession } from "../providers/ChatSessionContext";
 import { useNavigate } from "react-router-dom";
-import { getUserFromToken } from "@/lib/auth";
+import { getUserFromToken, removeToken } from "@/lib/auth";
 
 function ChatSidebar() {
   const navigate = useNavigate();
-  const { state, selectSession, addSession } = useChatSession();
+  const { state, selectSession, addSession, deleteSession } = useChatSession();
   const [searchQuery, setSearchQuery] = React.useState("");
   const [hoveredSessionId, setHoveredSessionId] = React.useState<string | null>(
     null
@@ -162,7 +162,11 @@ function ChatSidebar() {
                               <DropdownMenuItem>
                                 <Archive className="h-5 w-5 mr-2" /> Lưu trữ
                               </DropdownMenuItem>
-                              <DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  deleteSession(session._id);
+                                }}
+                              >
                                 <Trash2 className="h-5 w-5 mr-2 text-red-500" />{" "}
                                 Xóa
                               </DropdownMenuItem>
@@ -214,7 +218,14 @@ function ChatSidebar() {
                   Cài đặt
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Đăng xuất</DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    removeToken();
+                    navigate("/login");
+                  }}
+                >
+                  Đăng xuất
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>

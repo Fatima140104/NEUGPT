@@ -6,9 +6,8 @@ import config from "../config/config";
 const openai = new OpenAI({ apiKey: config.openaiApiKey });
 
 export const chatWithAI = async (req: Request, res: Response) => {
-  // TODO: Thực thi authentication method
-  const userId = "684c02e9d5d8bf6606007121";
-  const sessionId = req.body.sessionId || "mockSessionId";
+  const userId = (req as any).user?.id;
+  const sessionId = req.body.sessionId || "";
   const { message } = req.body;
 
   if (!sessionId) {
@@ -16,6 +15,9 @@ export const chatWithAI = async (req: Request, res: Response) => {
   }
   if (!message) {
     return res.status(400).json({ error: "Message is required" });
+  }
+  if (!userId) {
+    return res.status(401).json({ error: "User not authenticated" });
   }
 
   try {
