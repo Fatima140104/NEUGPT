@@ -40,8 +40,10 @@ import {
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useChatSession } from "../providers/ChatSessionContext";
+import { useNavigate } from "react-router-dom";
 
 function ChatSidebar() {
+  const navigate = useNavigate();
   const { state, selectSession, addSession } = useChatSession();
   const [searchQuery, setSearchQuery] = React.useState("");
   const [hoveredSessionId, setHoveredSessionId] = React.useState<string | null>(
@@ -117,7 +119,10 @@ function ChatSidebar() {
                     className="h-auto p-3  items-start"
                   >
                     <button
-                      onClick={() => selectSession(session._id)}
+                      onClick={() => {
+                        selectSession(session._id);
+                        navigate(`/c/${session._id}`);
+                      }}
                       className="w-full text-left"
                     >
                       <div className="flex items-center justify-between w-full mb-1">

@@ -1,10 +1,20 @@
+import { useEffect } from "react";
+import { useParams } from "react-router-dom";
 import Sidebar from "@/components/chat-sidebar";
 import { ChatView } from "@/components/Chat/ChatView";
 import { useChatSession } from "@/providers/ChatSessionContext";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
 function Home() {
-  const { state } = useChatSession();
+  const { sessionId } = useParams();
+  const { state, selectSession } = useChatSession();
+
+  useEffect(() => {
+    if (sessionId && state.selectedSessionId !== sessionId) {
+      selectSession(sessionId);
+    }
+  }, [sessionId, state.selectedSessionId, selectSession]);
+
   const selectedSession = state.sessions.find(
     (c) => c._id === state.selectedSessionId
   );
