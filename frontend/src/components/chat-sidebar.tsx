@@ -41,6 +41,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useChatSession } from "../providers/ChatSessionContext";
 import { useNavigate } from "react-router-dom";
+import { getUserFromToken } from "@/lib/auth";
 
 function ChatSidebar() {
   const navigate = useNavigate();
@@ -52,6 +53,8 @@ function ChatSidebar() {
   const [menuOpenSessionId, setMenuOpenSessionId] = React.useState<
     string | null
   >(null);
+
+  const user = getUserFromToken();
 
   const filteredSessions = (state.sessions || [])
     .sort(
@@ -186,15 +189,17 @@ function ChatSidebar() {
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton className="h-12 justify-start">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src="/placeholder.svg?height=32&width=32" />
+                    <AvatarImage src={user?.imageUrl || ""} />
                     <AvatarFallback>
                       <User className="h-4 w-4" />
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col items-start">
-                    <span className="text-sm font-medium">Người dùng</span>
+                    <span className="text-sm font-medium">
+                      {user?.displayName || "Người dùng"}
+                    </span>
                     <span className="text-xs text-muted-foreground">
-                      user@example.com
+                      {user?.email || ""}
                     </span>
                   </div>
                 </SidebarMenuButton>

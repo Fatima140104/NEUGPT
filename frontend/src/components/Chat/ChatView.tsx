@@ -3,6 +3,7 @@ import { MessageView } from "./MessageView";
 import { ChatForm } from "./ChatForm";
 import { useChat } from "../../providers/ChatContext";
 import { useChatSession } from "../../providers/ChatSessionContext";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 export const ChatView: React.FC = () => {
   const { state: chatState, dispatch } = useChat();
@@ -18,7 +19,7 @@ export const ChatView: React.FC = () => {
     }
     setLoading(true);
     setError(null);
-    fetch(`/api/chats/session/${sessionState.selectedSessionId}`)
+    fetchWithAuth(`/api/chats/session/${sessionState.selectedSessionId}`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch messages");
         return res.json();

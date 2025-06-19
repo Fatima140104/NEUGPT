@@ -3,6 +3,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import { ChatProvider } from "./providers/ChatContext";
 import { ChatSessionProvider } from "./providers/ChatSessionContext";
+import ProtectedRoute from "./routes/ProtectedRoute";
 
 function App() {
   return (
@@ -10,9 +11,13 @@ function App() {
       <ChatProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/c/:sessionId" element={<Home />} />
+            {/* Public route */}
             <Route path="/login" element={<Login />} />
+            {/* Protected routes */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/" element={<Home />} />
+              <Route path="/c/:sessionId" element={<Home />} />
+            </Route>
           </Routes>
         </BrowserRouter>
       </ChatProvider>

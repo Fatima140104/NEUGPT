@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { mockAuthMiddleware } from "../middlewares/authenticationHandler";
 import {
   createChat,
   getChats,
@@ -14,6 +15,9 @@ function asyncHandler(fn: any) {
   return (req: any, res: any, next: any) =>
     Promise.resolve(fn(req, res, next)).catch(next);
 }
+
+// Protect all chat routes with mockAuthMiddleware
+router.use(mockAuthMiddleware);
 
 router.get("/", asyncHandler(getChats));
 router.get("/:id", asyncHandler(getChatById));

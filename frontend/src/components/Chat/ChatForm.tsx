@@ -4,6 +4,7 @@ import { useChatSession } from "../../providers/ChatSessionContext";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Paperclip, Settings2, Mic } from "lucide-react";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 export const ChatForm: React.FC = () => {
   const [message, setMessage] = useState("");
@@ -44,7 +45,7 @@ export const ChatForm: React.FC = () => {
       setMessage("");
 
       // Gửi tin nhắn đến server với session ID
-      const res = await fetch("/api/ai/chat", {
+      const res = await fetchWithAuth("/api/ai/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -56,7 +57,9 @@ export const ChatForm: React.FC = () => {
       if (!res.ok) throw new Error("Gửi tin nhắn thất bại");
 
       // Tải lại tin nhắn cho session hiện tại
-      const fetchRes = await fetch(`/api/chats/session/${currentSessionId}`);
+      const fetchRes = await fetchWithAuth(
+        `/api/chats/session/${currentSessionId}`
+      );
       if (!fetchRes.ok) throw new Error("Không thể tải lại tin nhắn");
       const messages = await fetchRes.json();
       dispatch({ type: "SET_MESSAGES", payload: messages });

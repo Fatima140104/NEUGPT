@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect } from "react";
 import type { ReactNode } from "react";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 export interface ChatSession {
   _id: string;
@@ -89,7 +90,7 @@ export const ChatSessionProvider: React.FC<{ children: ReactNode }> = ({
   const fetchSessions = async () => {
     dispatch({ type: "SET_LOADING", payload: true });
     try {
-      const res = await fetch(`/api/sessions`);
+      const res = await fetchWithAuth(`/api/sessions`);
       const data = await res.json();
       // Map backend data to ChatSession type if needed
       dispatch({ type: "SET_SESSIONS", payload: data });
@@ -109,7 +110,7 @@ export const ChatSessionProvider: React.FC<{ children: ReactNode }> = ({
   // Add, update, delete session
   const addSession = async (title = "Cuộc trò chuyện mới") => {
     try {
-      const res = await fetch("/api/sessions", {
+      const res = await fetchWithAuth("/api/sessions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
