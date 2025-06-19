@@ -37,7 +37,7 @@ const chatSessionReducer = (
 ): ChatSessionState => {
   switch (action.type) {
     case "SET_SESSIONS":
-      return { ...state, sessions: action.payload };
+      return { ...state, sessions: action.payload || [] };
     case "ADD_SESSION":
       return { ...state, sessions: [action.payload, ...state.sessions] };
     case "UPDATE_SESSION":
@@ -91,12 +91,18 @@ export const ChatSessionProvider: React.FC<{ children: ReactNode }> = ({
     dispatch({ type: "SET_LOADING", payload: true });
     try {
       const res = await fetchWithAuth(`/api/sessions`);
+
+      if (!res.ok) {
+        throw new Error(`Failed to fetch sessions: ${res.statusText}`);
+      }
       const data = await res.json();
-      // Map backend data to ChatSession type if needed
-      dispatch({ type: "SET_SESSIONS", payload: data });
+      // Ensure data is an array, default to empty array if not
+      const sessions = Array.isArray(data) ? data : [];
+      dispatch({ type: "SET_SESSIONS", payload: sessions });
       dispatch({ type: "SET_ERROR", payload: null });
     } catch (err: any) {
       dispatch({ type: "SET_ERROR", payload: err.message });
+      dispatch({ type: "SET_SESSIONS", payload: [] });
     } finally {
       dispatch({ type: "SET_LOADING", payload: false });
     }
@@ -132,11 +138,32 @@ export const ChatSessionProvider: React.FC<{ children: ReactNode }> = ({
       throw err;
     }
   };
-  const updateSession = (session: ChatSession) => {
-    dispatch({ type: "UPDATE_SESSION", payload: session });
+  const updateSession = async (session: ChatSession) => {
+    try {
+      const res = await fetchWithAuth(`/api/sessions/${session._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: session.title }),
+      });
+      if (!res.ok) throw new Error("Failed to update session");
+      const updatedSession = await res.json();
+      dispatch({ type: "UPDATE_SESSION", payload: updatedSession });
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
   };
-  const deleteSession = (id: string) => {
-    dispatch({ type: "DELETE_SESSION", payload: id });
+  const deleteSession = async (id: string) => {
+    try {
+      const res = await fetchWithAuth(`/api/sessions/${id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Failed to delete session");
+      dispatch({ type: "DELETE_SESSION", payload: id });
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
   };
 
   // fetch sessions on mount

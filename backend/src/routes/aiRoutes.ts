@@ -13,6 +13,7 @@ function asyncHandler(fn: any) {
 // Protect all chat routes with mockAuthMiddleware
 router.use(mockAuthMiddleware);
 
-router.post("/", asyncHandler(chatWithAI));
+// Update the route path to match the frontend's expectation
+router.post("/chat", asyncHandler(chatWithAI));
 
 export default router;

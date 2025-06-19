@@ -7,9 +7,9 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 
 function App() {
   return (
-    <ChatSessionProvider>
-      <ChatProvider>
-        <BrowserRouter>
+    <BrowserRouter>
+      <ChatSessionProvider>
+        <ChatProvider>
           <Routes>
             {/* Public route */}
             <Route path="/login" element={<Login />} />
@@ -19,9 +19,9 @@ function App() {
               <Route path="/c/:sessionId" element={<Home />} />
             </Route>
           </Routes>
-        </BrowserRouter>
-      </ChatProvider>
-    </ChatSessionProvider>
+        </ChatProvider>
+      </ChatSessionProvider>
+    </BrowserRouter>
   );
 }
 
