@@ -3,12 +3,17 @@ import CodeBlock from "./CodeBlock";
 import { CodeBlockProvider } from "@/providers/CodeBlockContext";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import supersub from "remark-supersub";
 import rehypeKatex from "rehype-katex";
 import rehypeHighlight from "rehype-highlight";
+import remarkDirective from "remark-directive";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
-import { preprocessLaTeX } from "@/utils/lateX";
+import { preprocessLaTeX } from "@/utils/latex";
 import { langSubset } from "@/utils/languages";
+
+import type { Pluggable } from "unified";
 
 type TCodeProps = {
   inline?: boolean;
@@ -38,7 +43,7 @@ export const code: React.ElementType = memo(
       typeof children === "string" && children.split("\n").length === 1;
 
     if (isMath) {
-      return <>{children}</>;
+      return <span>{children}</span>;
     } else if (isSingleLine) {
       return (
         <code onDoubleClick={handleDoubleClick} className={className}>
@@ -52,11 +57,9 @@ export const code: React.ElementType = memo(
 );
 //
 const Markdown = memo(({ content = "", isLatestMessage }: any) => {
-  //TODO: kiểm tra lại logic parsing latex
   const LaTeXParsing = useSelector(
     (state: RootState) => state.settings.LaTeXParsing
   );
-  // const LaTeXParsing = true;
 
   const isInitializing = content === "";
 
@@ -82,13 +85,13 @@ const Markdown = memo(({ content = "", isLatestMessage }: any) => {
     []
   );
 
-  const remarkPlugins: any[] = [
-    // supersub,
+  const remarkPlugins: Pluggable[] = [
+    supersub,
     remarkGfm,
-    // remarkDirective,
+    remarkDirective,
     // artifactPlugin,
-    //[remarkMath, { singleDollarTextMath: true }],
-    //unicodeCitation,
+    [remarkMath, { singleDollarTextMath: true }],
+    // unicodeCitation,
   ];
 
   if (isInitializing) {

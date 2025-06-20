@@ -106,51 +106,36 @@ function isInCodeBlock(
  * @returns The processed string with escaped currency indicators and converted math delimiters.
  */
 export function preprocessLaTeX(content: string): string {
-  // Early return for most common case
-  if (!content.includes("$")) return content;
+  // Find all code block regions to avoid processing math inside them
+  const codeRegions = findCodeBlockRegions(content);
 
-  // Process mhchem first (usually rare, so check if needed)
-  let processed = content;
-  if (content.includes("\\ce{") || content.includes("\\pu{")) {
-    processed = escapeMhchem(content);
-  }
+  // This regex looks for either \[...\] or \(...\)
+  const unifiedRegex = /\\\[([\s\S]*?)\\\]|\\\(([\s\S]*?)\\\)/g;
 
-  // Find all code block regions once
-  const codeRegions = findCodeBlockRegions(processed);
-
-  // First pass: escape currency dollar signs
-  const parts: string[] = [];
-  let lastIndex = 0;
-
-  // Reset regex for reuse
-  CURRENCY_REGEX.lastIndex = 0;
-
-  let match: RegExpExecArray | null;
-  while ((match = CURRENCY_REGEX.exec(processed)) !== null) {
-    if (!isInCodeBlock(match.index, codeRegions)) {
-      parts.push(processed.substring(lastIndex, match.index));
-      parts.push("\\$");
-      lastIndex = match.index + 1;
+  const replacer = (
+    match: string,
+    bracketContent: string, // Captured content from \[...\]
+    parenContent: string, // Captured content from \(...\)
+    offset: number
+  ) => {
+    // If the match is inside a code block, leave it untouched
+    if (isInCodeBlock(offset, codeRegions)) {
+      return match;
     }
-  }
-  parts.push(processed.substring(lastIndex));
-  processed = parts.join("");
 
-  // Second pass: convert single dollar delimiters to double dollars
-  const result: string[] = [];
-  lastIndex = 0;
-
-  // Reset regex for reuse
-  SINGLE_DOLLAR_REGEX.lastIndex = 0;
-
-  while ((match = SINGLE_DOLLAR_REGEX.exec(processed)) !== null) {
-    if (!isInCodeBlock(match.index, codeRegions)) {
-      result.push(processed.substring(lastIndex, match.index));
-      result.push(`$$${match[1]}$$`);
-      lastIndex = match.index + match[0].length;
+    // If bracketContent is captured, it's display math
+    if (bracketContent !== undefined) {
+      return `$$${bracketContent}$$`;
     }
-  }
-  result.push(processed.substring(lastIndex));
 
-  return result.join("");
+    // If parenContent is captured, it's inline math
+    if (parenContent !== undefined) {
+      return `$${parenContent}$`;
+    }
+
+    // Fallback, should not be reached
+    return match;
+  };
+
+  return content.replace(unifiedRegex, replacer);
 }
