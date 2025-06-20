@@ -1,8 +1,13 @@
-import React from "react";
+import React, { memo } from "react";
 import { useChat } from "../../providers/ChatContext";
 import type { Message } from "../../providers/ChatContext";
 import { Avatar } from "@/components/ui/avatar";
 import { User, Bot } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
+import rehypeSanitize from "rehype-sanitize";
+import Markdown from "../Messages/Markdown";
 
 const MessageItem: React.FC<{ message: Message }> = ({ message }) => {
   return (
@@ -27,7 +32,13 @@ const MessageItem: React.FC<{ message: Message }> = ({ message }) => {
             {message.timestamp.toLocaleTimeString()}
           </span>
         </div>
-        <div className="prose prose-sm max-w-none">{message.content}</div>
+        <div className="prose prose-sm max-w-none dark:prose-invert">
+          {message.role === "assistant" ? (
+            <Markdown content={message.content} isLatestMessage={true} />
+          ) : (
+            message.content
+          )}
+        </div>
       </div>
     </div>
   );
