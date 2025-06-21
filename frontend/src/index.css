@@ -124,6 +124,7 @@
 code,
 pre {
   font-family: Consolas, Söhne Mono, Monaco, Andale Mono, Ubuntu Mono, monospace !important;
+  width: 100%;
 }
 code[class="language-plaintext"] {
   white-space: pre-line;
@@ -193,4 +194,15 @@ pre[class*="language-"] {
 .hljs-symbol,
 .hljs-title {
   color: #f22c3d;
+}
+
+.katex-display {
+  margin: 0;
+  padding: 1rem 0;
+  display: block;
+  text-align: center;
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+  width: 100%;
 }

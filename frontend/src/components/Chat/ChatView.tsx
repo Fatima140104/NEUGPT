@@ -52,7 +52,7 @@ export const ChatView: React.FC = () => {
   }
 
   return (
-    <div className="relative flex-1 h-full">
+    <div className="relative flex-1 h-0">
       <div className="absolute inset-0 flex flex-col">
         <div className="flex-1 overflow-y-auto pb-36">
           <div className="w-full max-w-3xl mx-auto flex items-center justify-center">

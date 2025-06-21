@@ -44,7 +44,7 @@ function Home() {
     <SidebarProvider defaultOpen={true}>
       <div className="flex min-h-screen w-full">
         <Sidebar />
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col overflow-hidden">
           <header className="border-b p-4 flex items-center gap-2">
             <SidebarTrigger />
             <h1 className="font-semibold">{selectedTitle}</h1>
