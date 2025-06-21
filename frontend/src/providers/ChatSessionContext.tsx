@@ -6,9 +6,8 @@ import React, {
   useCallback,
 } from "react";
 import type { ReactNode } from "react";
-import { useAuthFetch } from "@/hooks/useAuthFetch";
 import { getToken } from "@/lib/auth";
-
+import { useAuthFetch } from "@/hooks/useAuthFetch";
 export interface ChatSession {
   _id: string;
   title: string;
@@ -98,16 +97,16 @@ export const ChatSessionProvider: React.FC<{ children: ReactNode }> = ({
   const fetchSessions = useCallback(async () => {
     dispatch({ type: "SET_LOADING", payload: true });
     try {
-      const res = await authFetch(`/api/sessions`);
+      const res = await authFetch(`/sessions`);
       if (res === null) {
         // This case occurs on 401 redirect, no further action needed
         return;
       }
 
-      if (!res.ok) {
+      if (res.status !== 200) {
         throw new Error(`Failed to fetch sessions: ${res.statusText}`);
       }
-      const data = await res.json();
+      const data = await res.data;
       // Ensure data is an array, default to empty array if not
       const sessions = Array.isArray(data) ? data : [];
       dispatch({ type: "SET_SESSIONS", payload: sessions });
@@ -128,7 +127,7 @@ export const ChatSessionProvider: React.FC<{ children: ReactNode }> = ({
   // Add, update, delete session
   const addSession = async (title = "Cuộc trò chuyện mới") => {
     try {
-      const res = await authFetch("/api/sessions", {
+      const res = await authFetch("/sessions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -136,8 +135,8 @@ export const ChatSessionProvider: React.FC<{ children: ReactNode }> = ({
         }),
       });
       if (res === null) return;
-      if (!res.ok) throw new Error("Failed to create new session");
-      const newSession = await res.json();
+      if (res.status !== 200) throw new Error("Failed to create new session");
+      const newSession = await res.data;
       dispatch({
         type: "ADD_SESSION",
         payload: {
@@ -153,14 +152,14 @@ export const ChatSessionProvider: React.FC<{ children: ReactNode }> = ({
   };
   const updateSession = async (session: ChatSession) => {
     try {
-      const res = await authFetch(`/api/sessions/${session._id}`, {
+      const res = await authFetch(`/sessions/${session._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title: session.title }),
       });
       if (res === null) return;
-      if (!res.ok) throw new Error("Failed to update session");
-      const updatedSession = await res.json();
+      if (res.status !== 200) throw new Error("Failed to update session");
+      const updatedSession = await res.data;
       dispatch({ type: "UPDATE_SESSION", payload: updatedSession });
     } catch (err) {
       console.error(err);
@@ -169,11 +168,11 @@ export const ChatSessionProvider: React.FC<{ children: ReactNode }> = ({
   };
   const deleteSession = async (id: string) => {
     try {
-      const res = await authFetch(`/api/sessions/${id}`, {
+      const res = await authFetch(`/sessions/${id}`, {
         method: "DELETE",
       });
       if (res === null) return;
-      if (!res.ok) throw new Error("Failed to delete session");
+      if (res.status !== 200) throw new Error("Failed to delete session");
       dispatch({ type: "DELETE_SESSION", payload: id });
     } catch (err) {
       console.error(err);

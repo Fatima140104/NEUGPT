@@ -1,24 +1,10 @@
 import { useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-import { fetchWithAuth, AuthError } from "../lib/fetchWithAuth";
-import { removeToken } from "../lib/auth";
+import api from "../lib/api";
 
 export function useAuthFetch() {
-  const navigate = useNavigate();
-
-  return useCallback(
-    async (input: RequestInfo, init: RequestInit = {}) => {
-      try {
-        return await fetchWithAuth(input, init);
-      } catch (e) {
-        if (e instanceof AuthError) {
-          removeToken();
-          navigate("/login", { replace: true });
-          return null;
-        }
-        throw e;
-      }
-    },
-    [navigate]
-  );
+  return useCallback((url: string, config?: any) => {
+    // The hook now simply uses the pre-configured axios instance.
+    // All auth logic is handled by the interceptors in `api.ts`.
+    return api(url, config);
+  }, []);
 }
