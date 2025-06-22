@@ -129,13 +129,12 @@ export const ChatSessionProvider: React.FC<{ children: ReactNode }> = ({
     try {
       const res = await authFetch("/sessions", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+        data: {
           title,
-        }),
+        },
       });
       if (res === null) return;
-      if (res.status !== 200) throw new Error("Failed to create new session");
+      if (res.status !== 201) throw new Error("Failed to create new session");
       const newSession = await res.data;
       dispatch({
         type: "ADD_SESSION",
@@ -154,8 +153,7 @@ export const ChatSessionProvider: React.FC<{ children: ReactNode }> = ({
     try {
       const res = await authFetch(`/sessions/${session._id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: session.title }),
+        data: { title: session.title },
       });
       if (res === null) return;
       if (res.status !== 200) throw new Error("Failed to update session");

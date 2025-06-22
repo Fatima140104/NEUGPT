@@ -48,11 +48,10 @@ export const ChatForm: React.FC = () => {
       // Gửi tin nhắn đến server với session ID
       const res = await authFetch("/ai/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+        data: {
           sessionId: currentSessionId,
           message: userMessage.content,
-        }),
+        },
       });
 
       if (res.status !== 200) throw new Error("Gửi tin nhắn thất bại");
