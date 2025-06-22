@@ -3,9 +3,11 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { setToken } from "@/lib/auth";
+import { useChatSession } from "@/providers/ChatSessionContext";
 
 function Login() {
   const navigate = useNavigate();
+  const { fetchSessions } = useChatSession();
 
   const handleLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -14,6 +16,7 @@ function Login() {
     const data = await res.json();
     console.log(data);
     setToken(data.token);
+    await fetchSessions();
     navigate("/");
   };
 
