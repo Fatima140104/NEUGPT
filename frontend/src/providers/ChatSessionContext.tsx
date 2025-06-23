@@ -59,7 +59,7 @@ const chatSessionReducer = (
         sessions: state.sessions.filter((s) => s._id !== action.payload),
         selectedSessionId:
           state.selectedSessionId === action.payload
-            ? null
+            ? "new"
             : state.selectedSessionId,
       };
     case "SELECT_SESSION":
@@ -120,63 +120,72 @@ export const ChatSessionProvider: React.FC<{ children: ReactNode }> = ({
   }, [authFetch]);
 
   // Select a session
-  const selectSession = (id: string) => {
+  const selectSession = useCallback((id: string) => {
     dispatch({ type: "SELECT_SESSION", payload: id });
-  };
+  }, []);
 
   // Add, update, delete session
-  const addSession = async (title = "Cuộc trò chuyện mới") => {
-    try {
-      const res = await authFetch("/sessions", {
-        method: "POST",
-        data: {
-          title,
-        },
-      });
-      if (res === null) return;
-      if (res.status !== 201) throw new Error("Failed to create new session");
-      const newSession = await res.data;
-      dispatch({
-        type: "ADD_SESSION",
-        payload: {
-          _id: newSession._id || newSession.id,
-          title: newSession.title || "Cuộc trò chuyện mới",
-          timestamp: new Date(newSession.createdAt || Date.now()),
-        },
-      });
-      return newSession;
-    } catch (err) {
-      throw err;
-    }
-  };
-  const updateSession = async (session: ChatSession) => {
-    try {
-      const res = await authFetch(`/sessions/${session._id}`, {
-        method: "PUT",
-        data: { title: session.title },
-      });
-      if (res === null) return;
-      if (res.status !== 200) throw new Error("Failed to update session");
-      const updatedSession = await res.data;
-      dispatch({ type: "UPDATE_SESSION", payload: updatedSession });
-    } catch (err) {
-      console.error(err);
-      throw err;
-    }
-  };
-  const deleteSession = async (id: string) => {
-    try {
-      const res = await authFetch(`/sessions/${id}`, {
-        method: "DELETE",
-      });
-      if (res === null) return;
-      if (res.status !== 200) throw new Error("Failed to delete session");
-      dispatch({ type: "DELETE_SESSION", payload: id });
-    } catch (err) {
-      console.error(err);
-      throw err;
-    }
-  };
+  const addSession = useCallback(
+    async (title = "Cuộc trò chuyện mới") => {
+      try {
+        const res = await authFetch("/sessions", {
+          method: "POST",
+          data: {
+            title,
+          },
+        });
+        if (res === null) return;
+        if (res.status !== 201) throw new Error("Failed to create new session");
+        const newSession = await res.data;
+        dispatch({
+          type: "ADD_SESSION",
+          payload: {
+            _id: newSession._id || newSession.id,
+            title: newSession.title || "Cuộc trò chuyện mới",
+            timestamp: new Date(newSession.createdAt || Date.now()),
+          },
+        });
+        return newSession;
+      } catch (err) {
+        throw err;
+      }
+    },
+    [authFetch]
+  );
+  const updateSession = useCallback(
+    async (session: ChatSession) => {
+      try {
+        const res = await authFetch(`/sessions/${session._id}`, {
+          method: "PUT",
+          data: { title: session.title },
+        });
+        if (res === null) return;
+        if (res.status !== 200) throw new Error("Failed to update session");
+        const updatedSession = await res.data;
+        dispatch({ type: "UPDATE_SESSION", payload: updatedSession });
+      } catch (err) {
+        console.error(err);
+        throw err;
+      }
+    },
+    [authFetch]
+  );
+  const deleteSession = useCallback(
+    async (id: string) => {
+      try {
+        const res = await authFetch(`/sessions/${id}`, {
+          method: "DELETE",
+        });
+        if (res === null) return;
+        if (res.status !== 200) throw new Error("Failed to delete session");
+        dispatch({ type: "DELETE_SESSION", payload: id });
+      } catch (err) {
+        console.error(err);
+        throw err;
+      }
+    },
+    [authFetch]
+  );
 
   // fetch sessions on mount
   useEffect(() => {

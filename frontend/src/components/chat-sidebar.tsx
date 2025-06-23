@@ -45,7 +45,7 @@ import { getUserFromToken, removeToken } from "@/lib/auth";
 
 function ChatSidebar() {
   const navigate = useNavigate();
-  const { state, selectSession, addSession, deleteSession } = useChatSession();
+  const { state, selectSession, deleteSession } = useChatSession();
   const [searchQuery, setSearchQuery] = React.useState("");
   const [hoveredSessionId, setHoveredSessionId] = React.useState<string | null>(
     null
@@ -65,6 +65,16 @@ function ChatSidebar() {
       session.title?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+  const handleNewChat = () => {
+    selectSession("new");
+    navigate(`/c/new`);
+  };
+
+  const handleSelectSession = (id: string) => {
+    selectSession(id);
+    navigate(`/c/${id}`);
+  };
+
   return (
     <Sidebar className="border-r">
       <SidebarHeader className="border-b p-4">
@@ -75,7 +85,7 @@ function ChatSidebar() {
         <Button
           className="w-full justify-start gap-2"
           size="sm"
-          onClick={() => addSession()}
+          onClick={handleNewChat}
           disabled={state.loading}
         >
           <Plus className="h-4 w-4" />
@@ -122,10 +132,7 @@ function ChatSidebar() {
                     className="h-auto p-3  items-start"
                   >
                     <button
-                      onClick={() => {
-                        selectSession(session._id);
-                        navigate(`/c/${session._id}`);
-                      }}
+                      onClick={() => handleSelectSession(session._id)}
                       className="w-full text-left"
                     >
                       <div className="flex items-center justify-between w-full mb-1">

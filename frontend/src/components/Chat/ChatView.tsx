@@ -2,26 +2,34 @@ import React, { useEffect, useState } from "react";
 import { MessageView } from "./MessageView";
 import { ChatForm } from "./ChatForm";
 import { useChat } from "../../providers/ChatContext";
-import { useChatSession } from "../../providers/ChatSessionContext";
 import { useAuthFetch } from "@/hooks/useAuthFetch";
 import { cn } from "@/lib/utils";
+import { Landing } from "./Landing";
+import { LoadingSpinner } from "../ui/loading-spinner";
+import { useChatSession } from "@/providers/ChatSessionContext";
+import Header from "./Header";
+import { DropdownMenuSeparator } from "../ui/dropdown-menu";
 
-export const ChatView: React.FC = () => {
+interface ChatViewProps {
+  sessionId: string | undefined;
+}
+
+export const ChatView: React.FC<ChatViewProps> = ({ sessionId }) => {
   const { state: chatState, dispatch } = useChat();
-  const { state: sessionState } = useChatSession();
-  const { messages } = chatState;
+  const { state } = useChatSession();
+  const { messageTree } = chatState;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const authFetch = useAuthFetch();
 
   useEffect(() => {
-    if (!sessionState.selectedSessionId) {
+    if (!sessionId || sessionId === "new") {
       dispatch({ type: "SET_MESSAGES", payload: [] });
       return;
     }
     setLoading(true);
     setError(null);
-    authFetch(`/chats/session/${sessionState.selectedSessionId}`)
+    authFetch(`/chats/session/${sessionId}`)
       .then((res) => {
         dispatch({ type: "SET_MESSAGES", payload: res.data });
       })
@@ -33,52 +41,58 @@ export const ChatView: React.FC = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, [sessionState.selectedSessionId, dispatch, authFetch]);
+  }, [sessionId, dispatch, authFetch]);
+
+  const selectedSession =
+    sessionId === "new"
+      ? { title: "Cuộc trò chuyện mới" }
+      : state.sessions?.find((c) => c._id === sessionId);
+
+  const selectedTitle = selectedSession?.title || "Bắt đầu cuộc trò chuyện mới";
+  let content: React.ReactNode;
+  const isLandingPage =
+    (!messageTree || messageTree.length === 0) &&
+    (!sessionId || sessionId === "new");
+
+  if (loading && !isLandingPage) {
+    content = <LoadingSpinner />;
+  } else if (error) {
+    content = (
+      <div className="flex h-full items-center justify-center py-10">
+        <p className="text-red-500">{error}</p>
+      </div>
+    );
+  } else if (isLandingPage) {
+    content = <Landing />;
+  } else {
+    content = <MessageView />;
+  }
 
   return (
-    <div
-      className={cn(
-        "flex-1 h-0",
-        messages.length > 0
-          ? "relative"
-          : "flex flex-1 flex-col items-center justify-center"
-      )}
-    >
-      {messages.length === 0 ? (
-        <div className="mb-8 text-center">
-          <h2 className="text-3xl font-bold mb-2">What's up Homie?</h2>
-          <p className="text-muted-foreground text-base">
-            Tôi có thể giúp gì cho bạn?
-          </p>
-        </div>
-      ) : (
-        <div className="absolute inset-0 flex flex-col">
-          <div className="flex-1 overflow-y-auto pb-36">
-            <div className="w-full max-w-3xl mx-auto flex items-center justify-center">
-              {loading ? (
-                <div className="flex flex-1 flex-col items-center justify-center h-full text-muted-foreground">
-                  Đang tải tin nhắn...
-                </div>
-              ) : error ? (
-                <div className="flex flex-1 flex-col items-center justify-center h-full text-red-500">
-                  {error}
-                </div>
-              ) : (
-                <MessageView />
-              )}
-            </div>
+    <div className="flex h-full w-full flex-col">
+      {!loading && <Header selectedTitle={selectedTitle} />}
+      <DropdownMenuSeparator />
+      <>
+        <div
+          className={cn(
+            "flex flex-col",
+            isLandingPage
+              ? "flex-1 items-center justify-end sm:justify-center"
+              : "h-full overflow-y-auto"
+          )}
+        >
+          {content}
+          <div
+            className={cn(
+              "w-full",
+              isLandingPage &&
+                "max-w-3xl transition-all duration-200 xl:max-w-4xl"
+            )}
+          >
+            <ChatForm />
           </div>
         </div>
-      )}
-      <div
-        className={cn(
-          "w-full bg-transparent flex justify-center",
-          messages.length > 0 &&
-            "absolute bottom-0 left-0 right-0 z-10 transition-all duration-200"
-        )}
-      >
-        <ChatForm />
-      </div>
+      </>
     </div>
   );
 };

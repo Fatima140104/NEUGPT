@@ -3,23 +3,30 @@ import { useParams } from "react-router-dom";
 import Sidebar from "@/components/chat-sidebar";
 import { ChatView } from "@/components/Chat/ChatView";
 import { useChatSession } from "@/providers/ChatSessionContext";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { Loader2 } from "lucide-react";
 
 function Home() {
   const { sessionId } = useParams();
-  const { state, selectSession } = useChatSession();
+  const { state, selectSession, fetchSessions } = useChatSession();
 
   useEffect(() => {
-    if (sessionId && state.selectedSessionId !== sessionId) {
-      selectSession(sessionId);
-    }
-  }, [sessionId, state.selectedSessionId, selectSession]);
+    // Initial fetch of sessions
+    fetchSessions();
+  }, [fetchSessions]);
 
-  const selectedSession = state.sessions?.find(
-    (c) => c._id === state.selectedSessionId
-  );
-  const selectedTitle = selectedSession?.title || "New Chat";
+  useEffect(() => {
+    if (sessionId) {
+      // If the URL has a session ID, select it.
+      // This includes 'new' for a new chat.
+      if (state.selectedSessionId !== sessionId) {
+        selectSession(sessionId);
+      }
+    } else if (!state.selectedSessionId && state.sessions.length > 0) {
+      // If no session is selected and sessions exist, select the most recent one.
+      selectSession(state.sessions[0]._id);
+    }
+  }, [sessionId, state.selectedSessionId, state.sessions, selectSession]);
 
   if (state.loading) {
     return (
@@ -42,14 +49,10 @@ function Home() {
 
   return (
     <SidebarProvider defaultOpen={true}>
-      <div className="flex min-h-screen w-full">
+      <div className="relative flex h-screen w-full">
         <Sidebar />
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <header className="border-b p-4 flex items-center gap-2">
-            <SidebarTrigger />
-            <h1 className="font-semibold">{selectedTitle}</h1>
-          </header>
-          <ChatView />
+        <div className="flex-1 flex min-h-0 flex-col overflow-hidden">
+          <ChatView sessionId={sessionId} />
         </div>
       </div>
     </SidebarProvider>

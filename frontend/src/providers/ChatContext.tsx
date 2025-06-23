@@ -9,7 +9,7 @@ export interface Message {
 }
 
 interface ChatState {
-  messages: Message[];
+  messageTree: Message[];
   currentConversationId: string | null;
   isLoading: boolean;
   selectedChat?: string | null;
@@ -22,7 +22,7 @@ type ChatAction =
   | { type: "SET_MESSAGES"; payload: Message[] };
 
 const initialState: ChatState = {
-  messages: [],
+  messageTree: [],
   currentConversationId: null,
   isLoading: false,
   selectedChat: null,
@@ -33,12 +33,12 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
     case "ADD_MESSAGE":
       return {
         ...state,
-        messages: [...state.messages, action.payload],
+        messageTree: [...state.messageTree, action.payload],
       };
     case "SET_MESSAGES":
       return {
         ...state,
-        messages: action.payload,
+        messageTree: action.payload,
       };
 
     case "SET_LOADING":
@@ -49,7 +49,7 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
     case "CLEAR_MESSAGES":
       return {
         ...state,
-        messages: [],
+        messageTree: [],
       };
     default:
       return state;

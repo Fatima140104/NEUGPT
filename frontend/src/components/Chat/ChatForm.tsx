@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useChat } from "../../providers/ChatContext";
 import { useChatSession } from "../../providers/ChatSessionContext";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ export const ChatForm: React.FC = () => {
   const { state: sessionState, addSession, selectSession } = useChatSession();
   const [error, setError] = useState<string | null>(null);
   const authFetch = useAuthFetch();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,16 +23,16 @@ export const ChatForm: React.FC = () => {
     let currentSessionId = sessionState.selectedSessionId;
 
     try {
-      // Nếu không có session ID, hãy tạo một session mới và lấy ID của nó
-      if (!currentSessionId) {
+      if (!currentSessionId || currentSessionId === "new") {
         const newSession = await addSession("Cuộc trò chuyện mới");
         if (!newSession || !newSession._id) {
           throw new Error("Không thể tạo hoặc lấy ID của cuộc trò chuyện mới.");
         }
-        currentSessionId = newSession._id; // Lấy ID từ session vừa được tạo
+        currentSessionId = newSession._id;
         if (typeof currentSessionId === "string") {
-          selectSession(currentSessionId); // Chọn session mới này làm session hiện tại
+          selectSession(currentSessionId);
         }
+        navigate(`/c/${currentSessionId}`, { replace: true });
       }
 
       setError(null);
@@ -89,7 +91,7 @@ export const ChatForm: React.FC = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full flex flex-col items-center px-2 pb-4 pt-2"
+      className="w-full flex flex-col items-center px-2 pb-4 pt-2 bg-transparent"
       autoComplete="off"
     >
       <div className="shadow-lg flex w-full max-w-3xl flex-col items-center justify-center overflow-clip rounded-[28px] bg-background dark:bg-[#303030]">
