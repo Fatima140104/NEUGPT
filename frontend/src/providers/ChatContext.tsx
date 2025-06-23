@@ -11,6 +11,8 @@ export interface Message {
 interface ChatState {
   messageTree: Message[];
   currentConversationId: string | null;
+  abortScroll: boolean;
+  isSubmitting: boolean;
   isLoading: boolean;
   selectedChat?: string | null;
 }
@@ -19,11 +21,15 @@ type ChatAction =
   | { type: "ADD_MESSAGE"; payload: Message }
   | { type: "SET_LOADING"; payload: boolean }
   | { type: "CLEAR_MESSAGES" }
-  | { type: "SET_MESSAGES"; payload: Message[] };
+  | { type: "SET_MESSAGES"; payload: Message[] }
+  | { type: "SET_ABORT_SCROLL"; payload: boolean }
+  | { type: "SET_IS_SUBMITTING"; payload: boolean };
 
 const initialState: ChatState = {
   messageTree: [],
   currentConversationId: null,
+  abortScroll: false,
+  isSubmitting: false,
   isLoading: false,
   selectedChat: null,
 };
@@ -40,7 +46,6 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         ...state,
         messageTree: action.payload,
       };
-
     case "SET_LOADING":
       return {
         ...state,
@@ -50,6 +55,16 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
       return {
         ...state,
         messageTree: [],
+      };
+    case "SET_ABORT_SCROLL":
+      return {
+        ...state,
+        abortScroll: action.payload,
+      };
+    case "SET_IS_SUBMITTING":
+      return {
+        ...state,
+        isSubmitting: action.payload,
       };
     default:
       return state;

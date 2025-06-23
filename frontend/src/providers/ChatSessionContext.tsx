@@ -12,6 +12,7 @@ export interface ChatSession {
   _id: string;
   title: string;
   timestamp: Date;
+  archived?: boolean;
 }
 
 interface ChatSessionState {
@@ -126,7 +127,7 @@ export const ChatSessionProvider: React.FC<{ children: ReactNode }> = ({
 
   // Add, update, delete session
   const addSession = useCallback(
-    async (title = "Cuộc trò chuyện mới") => {
+    async (title = "Cuộc trò chuyện") => {
       try {
         const res = await authFetch("/sessions", {
           method: "POST",
@@ -141,7 +142,7 @@ export const ChatSessionProvider: React.FC<{ children: ReactNode }> = ({
           type: "ADD_SESSION",
           payload: {
             _id: newSession._id || newSession.id,
-            title: newSession.title || "Cuộc trò chuyện mới",
+            title: newSession.title || "Cuộc trò chuyện",
             timestamp: new Date(newSession.createdAt || Date.now()),
           },
         });

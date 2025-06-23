@@ -70,7 +70,7 @@ export const ChatView: React.FC<ChatViewProps> = ({ sessionId }) => {
 
   return (
     <div className="flex h-full w-full flex-col">
-      {!loading && <Header selectedTitle={selectedTitle} />}
+      <Header selectedTitle={selectedTitle} sessionId={sessionId} />
       <DropdownMenuSeparator />
       <>
         <div
