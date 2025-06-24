@@ -55,6 +55,15 @@ export const code: React.ElementType = memo(
     }
   }
 );
+
+type TParagraphProps = {
+  children: React.ReactNode;
+};
+
+export const p: React.ElementType = memo(({ children }: TParagraphProps) => {
+  return <p className="mb-2 whitespace-pre-wrap">{children}</p>;
+});
+
 //
 const Markdown = memo(({ content = "", isLatestMessage }: any) => {
   const LaTeXParsing = useSelector(
@@ -115,7 +124,7 @@ const Markdown = memo(({ content = "", isLatestMessage }: any) => {
           {
             code,
             //   a,
-            //   p,
+            p,
             //   artifact: Artifact,
             //   citation: Citation,
             // "highlighted-text": HighlightedText,

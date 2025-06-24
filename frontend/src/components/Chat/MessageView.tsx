@@ -8,19 +8,26 @@ import ScrollToBottom from "../Messages/ScrollToBottom";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
 import { AnimatePresence, motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 const MessageItem: React.FC<{ message: Message }> = ({ message }) => {
   const isUser = message.role === "user";
   return (
     <div className="max-w-3xl mx-auto w-full flex">
       <div
-        className={`flex w-full ${isUser ? "justify-end" : "justify-start"}`}
+        className={cn(
+          "flex w-full",
+          isUser && "justify-end",
+          !isUser && "justify-start"
+        )}
       >
         <div
-          className={`
-            relative  rounded-3xl px-5 py-2.5 text-base break-words whitespace-pre-wrap
-            ${isUser ? "max-w-[70%] bg-[#313031] text-white items-end" : ""}
-          `}
+          className={cn(
+            "relative rounded-3xl py-2.5 text-base break-words whitespace-pre-wrap",
+            isUser
+              ? "max-w-[70%] bg-[#313031] text-white items-end px-5"
+              : "w-full"
+          )}
         >
           <Container>
             <Markdown content={message.content} isLatestMessage={true} />
@@ -45,10 +52,10 @@ export const MessageView: React.FC = () => {
 
   return (
     <div
-      className="relative flex-1 overflow-hidden overflow-y-auto"
+      className="relative markdown flex-1 overflow-hidden overflow-y-auto -mb-(--composer-overlap-px) [--composer-overlap-px:24px] z-10"
       ref={scrollableRef}
     >
-      <div className="space-y-4 p-4">
+      <div className="space-y-4 pb-4 pl-4">
         {messages.map((message) => (
           <MessageItem
             key={(message as any)._id || message.id}

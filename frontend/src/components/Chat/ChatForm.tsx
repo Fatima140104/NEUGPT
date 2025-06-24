@@ -91,10 +91,10 @@ export const ChatForm: React.FC = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full flex flex-col items-center px-2 pb-4 pt-2 bg-transparent"
+      className="w-full flex flex-col items-center px-2 pb-4 pt-2"
       autoComplete="off"
     >
-      <div className="shadow-lg flex w-full max-w-3xl flex-col items-center justify-center overflow-clip rounded-[28px] bg-background dark:bg-[#303030]">
+      <div className="shadow-lg flex w-full max-w-3xl flex-col mx-auto items-center justify-center overflow-clip rounded-[28px] bg-background dark:bg-[#303030]">
         <div className="relative flex w-full items-end px-2.5 py-2.5">
           <div className="flex w-full flex-col">
             <div className="flex min-h-12 items-start">

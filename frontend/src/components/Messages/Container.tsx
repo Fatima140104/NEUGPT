@@ -9,7 +9,7 @@ const Container = ({
   //   message?: TMessage;
 }) => (
   <div
-    className="text-message flex min-h-[20px] flex-col items-start gap-3 max-w-[90vw] [.text-message+&]:mt-5 break-words"
+    className="text-message flex min-h-[20px] flex-col items-start gap-3 max-w-[90vw] [.text-message+&]:mt-5 break-words mx-auto"
     dir="auto"
   >
     {/* {message?.isCreatedByUser === true && <Files message={message} />} */}

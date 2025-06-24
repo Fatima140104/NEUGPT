@@ -84,7 +84,7 @@ export const ChatView: React.FC<ChatViewProps> = ({ sessionId }) => {
           {content}
           <div
             className={cn(
-              "w-full",
+              "relative w-full z-20",
               isLandingPage &&
                 "max-w-3xl transition-all duration-200 xl:max-w-4xl"
             )}

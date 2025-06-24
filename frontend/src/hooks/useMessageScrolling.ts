@@ -39,16 +39,14 @@ export default function useMessageScrolling(
     const handleScroll = () => {
       if (!scrollableRef.current || !messagesEndRef.current) return;
       const { scrollTop, scrollHeight, clientHeight } = scrollableRef.current;
-      console.log({ scrollTop, scrollHeight, clientHeight });
       setShowScrollButton(scrollHeight - scrollTop - clientHeight > 100);
     };
     const ref = scrollableRef.current;
     if (ref) {
       ref.addEventListener("scroll", handleScroll);
-      handleScroll();
       return () => ref.removeEventListener("scroll", handleScroll);
     }
-  }, [scrollableRef.current]);
+  }, []);
 
   // Auto-scroll to bottom when messages change or loading ends
   useEffect(() => {
