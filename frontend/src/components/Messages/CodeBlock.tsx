@@ -55,7 +55,9 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
   return (
     <pre className={cn("overflow-auto w-full", classProp)}>
       <div className="my-4 overflow-hidden rounded-md bg-code-block-background text-sm text-white/80">
-        <CodeBar lang={lang} error={error} codeRef={codeRef} />
+        <div className="not-prose">
+          <CodeBar lang={lang} error={error} codeRef={codeRef} />
+        </div>
         <code
           ref={codeRef}
           className={cn(
