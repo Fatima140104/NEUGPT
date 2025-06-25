@@ -17,7 +17,7 @@ const CodeBar: React.FC<
 > = React.memo(({ lang, error, codeRef }) => {
   const [isCopied, setIsCopied] = useState(false);
   return (
-    <div className="relative flex items-center justify-between bg-code-block-background px-4 py-1.5 font-sans text-xs text-gray-200">
+    <div className="relative flex items-center justify-between bg-code-block-background px-4 py-1.5 pt-4 font-sans text-xs text-gray-200">
       <span className="lowercase">{lang}</span>
       <div className="flex items-center gap-4">
         <button
@@ -53,9 +53,9 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
   const codeRef = useRef<HTMLElement | null>(null);
 
   return (
-    <div className="my-4 overflow-hidden rounded-md bg-code-block-background text-sm text-white/80">
-      <CodeBar lang={lang} error={error} codeRef={codeRef} />
-      <div className={cn("overflow-auto w-full p-4", classProp)}>
+    <pre className={cn("overflow-auto w-full", classProp)}>
+      <div className="my-4 overflow-hidden rounded-md bg-code-block-background text-sm text-white/80">
+        <CodeBar lang={lang} error={error} codeRef={codeRef} />
         <code
           ref={codeRef}
           className={cn(
@@ -68,7 +68,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
           {codeChildren}
         </code>
       </div>
-    </div>
+    </pre>
   );
 };
 

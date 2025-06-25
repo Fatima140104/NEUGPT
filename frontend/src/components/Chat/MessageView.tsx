@@ -23,15 +23,19 @@ const MessageItem: React.FC<{ message: Message }> = ({ message }) => {
       >
         <div
           className={cn(
-            "relative rounded-3xl py-2.5 text-base break-words whitespace-pre-wrap",
+            "relative rounded-3xl py-2.5 text-base break-words",
             isUser
               ? "max-w-[70%] bg-[#313031] text-white items-end px-5"
               : "w-full"
           )}
         >
-          <Container>
-            <Markdown content={message.content} isLatestMessage={true} />
-          </Container>
+          {isUser ? (
+            <div>{message.content}</div>
+          ) : (
+            <Container>
+              <Markdown content={message.content} isLatestMessage={true} />
+            </Container>
+          )}
         </div>
       </div>
     </div>
@@ -52,7 +56,7 @@ export const MessageView: React.FC = () => {
 
   return (
     <div
-      className="relative markdown flex-1 overflow-hidden overflow-y-auto -mb-(--composer-overlap-px) [--composer-overlap-px:24px] z-10"
+      className="relative flex-1 overflow-hidden overflow-y-auto -mb-(--composer-overlap-px) [--composer-overlap-px:24px] z-10"
       ref={scrollableRef}
     >
       <div className="space-y-4 pb-4 pl-4">

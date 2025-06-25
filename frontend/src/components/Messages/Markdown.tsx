@@ -12,8 +12,8 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
 import { preprocessLaTeX } from "@/utils/latex";
 import { langSubset } from "@/utils/languages";
-
 import type { Pluggable } from "unified";
+import remarkHr from "@/utils/remarkHr";
 
 type TCodeProps = {
   inline?: boolean;
@@ -61,7 +61,11 @@ type TParagraphProps = {
 };
 
 export const p: React.ElementType = memo(({ children }: TParagraphProps) => {
-  return <p className="mb-2 whitespace-pre-wrap">{children}</p>;
+  return <p>{children}</p>;
+});
+
+export const hr: React.ElementType = memo(() => {
+  return <hr />;
 });
 
 //
@@ -98,6 +102,7 @@ const Markdown = memo(({ content = "", isLatestMessage }: any) => {
     supersub,
     remarkGfm,
     remarkDirective,
+    remarkHr,
     // artifactPlugin,
     [remarkMath, { singleDollarTextMath: true }],
     // unicodeCitation,
@@ -125,6 +130,7 @@ const Markdown = memo(({ content = "", isLatestMessage }: any) => {
             code,
             //   a,
             p,
+            hr,
             //   artifact: Artifact,
             //   citation: Citation,
             // "highlighted-text": HighlightedText,
