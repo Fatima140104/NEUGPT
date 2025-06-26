@@ -1,6 +1,7 @@
 # NEUGPT Backend
 
 ## Yêu cầu
+
 - Node.js
 - npm
 
@@ -32,9 +33,11 @@ Tạo file `.env` dựa trên file mẫu `.env.example`:
 PORT=3000
 NODE_ENV=development
 OPENAI_API_KEY=
+MONGODB_URI=
 ```
 
 ## Thư mục chính
+
 - `src/` - Mã nguồn backend (Express, TypeScript)
 - `src/routes/` - Định nghĩa các route
 - `src/controllers/` - Xử lý logic

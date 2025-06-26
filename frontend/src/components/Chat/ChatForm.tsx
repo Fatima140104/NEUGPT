@@ -1,45 +1,72 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useChat } from "../../providers/ChatContext";
+import { useChatSession } from "../../providers/ChatSessionContext";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Paperclip, Settings2, Mic } from "lucide-react";
+import { useAuthFetch } from "@/hooks/useAuthFetch";
 
 export const ChatForm: React.FC = () => {
   const [message, setMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { state, dispatch } = useChat();
+  const { state: sessionState, addSession, selectSession } = useChatSession();
+  const [error, setError] = useState<string | null>(null);
+  const authFetch = useAuthFetch();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim() || state.isLoading) return;
 
-    const userMessage = {
-      id: Date.now().toString(),
-      role: "user" as const,
-      content: message.trim(),
-      timestamp: new Date(),
-    };
-
-    dispatch({ type: "ADD_MESSAGE", payload: userMessage });
-    dispatch({ type: "SET_LOADING", payload: true });
-    setMessage("");
+    let currentSessionId = sessionState.selectedSessionId;
 
     try {
-      // TODO: Implement API call to your backend
-      // For now, we'll simulate a response
-      setTimeout(() => {
-        const aiMessage = {
-          id: (Date.now() + 1).toString(),
-          role: "assistant" as const,
-          content:
-            "This is a simulated response. Implement your API call here.",
-          timestamp: new Date(),
-        };
-        dispatch({ type: "ADD_MESSAGE", payload: aiMessage });
-        dispatch({ type: "SET_LOADING", payload: false });
-      }, 1000);
-    } catch (error) {
-      console.error("Error sending message:", error);
+      if (!currentSessionId || currentSessionId === "new") {
+        const newSession = await addSession("Cuộc trò chuyện mới");
+        if (!newSession || !newSession._id) {
+          throw new Error("Không thể tạo hoặc lấy ID của cuộc trò chuyện mới.");
+        }
+        currentSessionId = newSession._id;
+        if (typeof currentSessionId === "string") {
+          selectSession(currentSessionId);
+        }
+        navigate(`/c/${currentSessionId}`, { replace: true });
+      }
+
+      setError(null);
+      const userMessage = {
+        id: Date.now().toString(),
+        role: "user" as const,
+        content: message.trim(),
+        timestamp: new Date(),
+      };
+
+      dispatch({ type: "ADD_MESSAGE", payload: userMessage });
+      dispatch({ type: "SET_LOADING", payload: true });
+      setMessage("");
+
+      // Gửi tin nhắn đến server với session ID
+      const res = await authFetch("/ai/chat", {
+        method: "POST",
+        data: {
+          sessionId: currentSessionId,
+          message: userMessage.content,
+        },
+      });
+
+      if (res.status !== 200) throw new Error("Gửi tin nhắn thất bại");
+
+      // Tải lại tin nhắn cho session hiện tại
+      const fetchRes = await authFetch(`/chats/session/${currentSessionId}`);
+      if (fetchRes.status !== 200)
+        throw new Error("Không thể tải lại tin nhắn");
+      const messages = fetchRes.data;
+      dispatch({ type: "SET_MESSAGES", payload: messages });
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
       dispatch({ type: "SET_LOADING", payload: false });
     }
   };
@@ -67,7 +94,7 @@ export const ChatForm: React.FC = () => {
       className="w-full flex flex-col items-center px-2 pb-4 pt-2"
       autoComplete="off"
     >
-      <div className="shadow-lg flex w-full max-w-2xl flex-col items-center justify-center overflow-clip rounded-[28px] bg-background dark:bg-[#303030]">
+      <div className="shadow-lg flex w-full max-w-3xl flex-col mx-auto items-center justify-center overflow-clip rounded-[28px] bg-background dark:bg-[#303030]">
         <div className="relative flex w-full items-end px-2.5 py-2.5">
           <div className="flex w-full flex-col">
             <div className="flex min-h-12 items-start">
@@ -91,6 +118,7 @@ export const ChatForm: React.FC = () => {
                 <Send className="h-5 w-5" />
               </Button>
             </div>
+            {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
           </div>
         </div>
         {/* Tools/Actions Section */}

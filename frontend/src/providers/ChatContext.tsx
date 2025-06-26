@@ -9,21 +9,29 @@ export interface Message {
 }
 
 interface ChatState {
-  messages: Message[];
+  messageTree: Message[];
   currentConversationId: string | null;
+  abortScroll: boolean;
+  isSubmitting: boolean;
   isLoading: boolean;
+  selectedChat?: string | null;
 }
 
 type ChatAction =
   | { type: "ADD_MESSAGE"; payload: Message }
-  | { type: "SET_CONVERSATION"; payload: string }
   | { type: "SET_LOADING"; payload: boolean }
-  | { type: "CLEAR_MESSAGES" };
+  | { type: "CLEAR_MESSAGES" }
+  | { type: "SET_MESSAGES"; payload: Message[] }
+  | { type: "SET_ABORT_SCROLL"; payload: boolean }
+  | { type: "SET_IS_SUBMITTING"; payload: boolean };
 
 const initialState: ChatState = {
-  messages: [],
+  messageTree: [],
   currentConversationId: null,
+  abortScroll: false,
+  isSubmitting: false,
   isLoading: false,
+  selectedChat: null,
 };
 
 const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
@@ -31,12 +39,12 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
     case "ADD_MESSAGE":
       return {
         ...state,
-        messages: [...state.messages, action.payload],
+        messageTree: [...state.messageTree, action.payload],
       };
-    case "SET_CONVERSATION":
+    case "SET_MESSAGES":
       return {
         ...state,
-        currentConversationId: action.payload,
+        messageTree: action.payload,
       };
     case "SET_LOADING":
       return {
@@ -46,7 +54,17 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
     case "CLEAR_MESSAGES":
       return {
         ...state,
-        messages: [],
+        messageTree: [],
+      };
+    case "SET_ABORT_SCROLL":
+      return {
+        ...state,
+        abortScroll: action.payload,
+      };
+    case "SET_IS_SUBMITTING":
+      return {
+        ...state,
+        isSubmitting: action.payload,
       };
     default:
       return state;
