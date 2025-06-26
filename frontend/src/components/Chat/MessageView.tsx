@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import loadingMessageAnimation from "@/assets/loading-message-animation.webm";
 
 const MessageItem: React.FC<{ message: Message }> = ({ message }) => {
   const isUser = message.role === "user";
@@ -59,7 +60,7 @@ export const MessageView: React.FC = () => {
       className="relative flex-1 overflow-hidden overflow-y-auto -mb-(--composer-overlap-px) [--composer-overlap-px:24px] z-10"
       ref={scrollableRef}
     >
-      <div className="space-y-4 pb-4 pl-4">
+      <div className="space-y-4 pt-5 pb-4 px-4">
         {messages.map((message) => (
           <MessageItem
             key={(message as any)._id || message.id}
@@ -75,7 +76,14 @@ export const MessageView: React.FC = () => {
         {isLoading && (
           <div className="max-w-3xl mx-auto w-full flex justify-start">
             <div className="relative max-w-[70%] rounded-3xl px-5 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100">
-              <span>...</span>
+              <video
+                src={loadingMessageAnimation}
+                autoPlay
+                loop
+                muted
+                playsInline
+                style={{ width: 30, height: 30, objectFit: "contain" }}
+              />
             </div>
           </div>
         )}

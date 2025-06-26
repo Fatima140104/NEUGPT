@@ -266,41 +266,7 @@ body,
   );
 }
 
-.markdown h1 {
-  font-size: calc(var(--markdown-font-size) * 1.75);
-}
-.markdown h2 {
-  font-size: calc(var(--markdown-font-size) * 1.5);
-}
-.markdown h1,
-.markdown h2 {
-  font-weight: 600;
-}
-.markdown h2 {
-  margin-bottom: 8px;
-  margin-top: 24px;
-}
-.markdown h3 {
-  font-weight: 600;
-  font-size: calc(var(--markdown-font-size) * 1.25);
-}
-
-.markdown h3,
-.markdown h4 {
-  margin-bottom: 0.5rem;
-  margin-top: 1rem;
-}
-
-.markdown h4 {
-  font-weight: 400;
-  font-size: calc(var(--markdown-font-size) * 1.1);
-}
-
-.markdown h5 {
-  font-weight: 600;
-  font-size: var(--markdown-font-size);
-}
-
+/* Markdown */
 .markdown blockquote {
   --tw-border-opacity: 1;
   border-color: rgba(142, 142, 160, var(--tw-border-opacity));
@@ -336,14 +302,6 @@ body,
   text-decoration-line: underline;
   text-underline-offset: 2px;
 }
-
-/* .markdown hr {
-  border-color: var(--border-dark);
-  margin-block: calc(var(--spacing) * 6);
-  border-width: 1px;
-  width: 100%;
-  border-style: solid;
-} */
 
 .markdown p {
   margin-bottom: 0.5rem;
@@ -495,8 +453,9 @@ body,
 .prose :where(hr):not(:where([class~="not-prose"] *)) {
   border-color: var(--tw-prose-hr);
   border-top-width: 1px;
-  margin-bottom: 3em;
-  margin-top: 3em;
+  width: 100%;
+  margin-bottom: 2em;
+  margin-top: 2em;
 }
 .prose :where(blockquote):not(:where([class~="not-prose"] *)) {
   border-left-color: var(--tw-prose-quote-borders);
@@ -561,7 +520,7 @@ body,
   font-weight: 600;
   line-height: 1.5;
   margin-bottom: 0.5em;
-  margin-top: 1.5em;
+  margin-top: 0em;
 }
 .prose :where(h4 strong):not(:where([class~="not-prose"] *)) {
   color: inherit;

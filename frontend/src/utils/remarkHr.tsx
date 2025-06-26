@@ -22,11 +22,11 @@ export default function remarkHr() {
       const current = tree.children[i];
       const next = tree.children[i + 1];
 
-      // Insert <hr> between two major headings (e.g., ## or higher)
+      // Insert <hr> before major headings (e.g., ### or higher)
       if (
-        current.type === "heading" &&
+        (current.type === "heading" || isSectionParagraph(current)) &&
         next.type === "heading" &&
-        (current.depth <= 2 || next.depth <= 2)
+        next.depth <= 3
       ) {
         tree.children.splice(i + 1, 0, { type: "thematicBreak" });
         i++;
