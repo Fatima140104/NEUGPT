@@ -6,15 +6,26 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Paperclip, Settings2, Mic } from "lucide-react";
 import { useAuthFetch } from "@/hooks/useAuthFetch";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { getAvailableModels, type AIModel } from "@/config/models";
 
 export const ChatForm: React.FC = () => {
   const [message, setMessage] = useState("");
+  const [selectedModel, setSelectedModel] = useState<AIModel | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { state, dispatch } = useChat();
   const { state: sessionState, addSession, selectSession } = useChatSession();
   const [error, setError] = useState<string | null>(null);
   const authFetch = useAuthFetch();
   const navigate = useNavigate();
+  const availableModels = getAvailableModels();
+
+  // Initialize selected model with the first available model
+  useEffect(() => {
+    if (!selectedModel && availableModels.length > 0) {
+      setSelectedModel(availableModels[0]);
+    }
+  }, [availableModels, selectedModel]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,12 +58,13 @@ export const ChatForm: React.FC = () => {
       dispatch({ type: "SET_LOADING", payload: true });
       setMessage("");
 
-      // Gửi tin nhắn đến server với session ID
+      // Gửi tin nhắn đến server với session ID và model
       const res = await authFetch("/ai/chat", {
         method: "POST",
         data: {
           sessionId: currentSessionId,
           message: userMessage.content,
+          model: selectedModel?.id || "gpt-3.5-turbo",
         },
       });
 
@@ -132,14 +144,38 @@ export const ChatForm: React.FC = () => {
             >
               <Paperclip className="h-5 w-5" />
             </Button>
-            <Button
-              type="button"
-              size="icon"
-              variant="ghost"
-              className="rounded-full"
-            >
-              <Settings2 className="h-5 w-5" />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="rounded-full px-3 h-8 text-xs flex items-center gap-2"
+                >
+                  <Settings2 className="h-4 w-4" />
+                  <span className="hidden sm:inline">
+                    {selectedModel?.name || "Model"}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Model</DropdownMenuLabel>
+                {availableModels.map((model) => (
+                  <DropdownMenuItem
+                    key={model.id}
+                    onClick={() => setSelectedModel(model)}
+                    className={selectedModel?.id === model.id ? "bg-accent" : ""}
+                  >
+                    <div className="flex flex-col">
+                      <p className="font-medium">{model.name}</p>
+                      {model.description && (
+                        <p className="text-xs text-muted-foreground">{model.description}</p>
+                      )}
+                    </div>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
           </div>
           <div className="flex gap-1">
             <Button

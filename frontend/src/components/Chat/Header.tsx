@@ -20,23 +20,16 @@ const Header: React.FC<HeaderProps> = ({ selectedTitle, sessionId }) => {
   const { deleteSession, updateSession, state } = useChatSession();
   const session = sessionId && state.sessions.find((s) => s._id === sessionId);
   const navigate = useNavigate();
-  const handleArchive = async () => {
-    if (session) {
-      await updateSession({ ...session, archived: true });
-    }
-  };
+  // const handleArchive = async () => {
+  //   if (session) {
+  //     await updateSession({ ...session, archived: true });
+  //   }
+  // };
 
   const handleDelete = async () => {
     if (sessionId) {
       await deleteSession(sessionId);
       navigate("/");
-    }
-  };
-
-  const handleShare = () => {
-    if (sessionId) {
-      const url = `${window.location.origin}/c/${sessionId}`;
-      navigator.clipboard.writeText(url);
     }
   };
 
@@ -47,10 +40,6 @@ const Header: React.FC<HeaderProps> = ({ selectedTitle, sessionId }) => {
         <h1 className="font-semibold">{selectedTitle}</h1>
       </div>
       <div className="flex items-center gap-2">
-        <Button variant="ghost" onClick={handleShare}>
-          <Share2 className="mr-1 h-4 w-4" />
-          Share
-        </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost">
@@ -58,10 +47,10 @@ const Header: React.FC<HeaderProps> = ({ selectedTitle, sessionId }) => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={handleArchive}>
+            {/* <DropdownMenuItem onClick={handleArchive}>
               <Archive className="mr-2 h-4 w-4" />
               Archive
-            </DropdownMenuItem>
+            </DropdownMenuItem> */}
             <DropdownMenuItem onClick={handleDelete} className="text-red-500">
               <Trash2 className="mr-2 h-4 w-4" />
               Delete

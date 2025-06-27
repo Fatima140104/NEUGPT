@@ -160,9 +160,6 @@ function ChatSidebar() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="start">
                               <DropdownMenuItem>
-                                <Share className="h-5 w-5 mr-2" /> Chia sẻ
-                              </DropdownMenuItem>
-                              <DropdownMenuItem>
                                 <Edit3 className="h-5 w-5 mr-2" /> Đổi tên
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
