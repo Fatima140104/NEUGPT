@@ -1,24 +1,14 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import Login from "./pages/Login";
+import { BrowserRouter } from "react-router-dom";
 import { ChatProvider } from "./providers/ChatContext";
 import { ChatSessionProvider } from "./providers/ChatSessionContext";
-import ProtectedRoute from "./routes/ProtectedRoute";
+import AppRoutes from "./routes/AppRoutes";
 
 function App() {
   return (
     <BrowserRouter>
       <ChatSessionProvider>
         <ChatProvider>
-          <Routes>
-            {/* Public route */}
-            <Route path="/login" element={<Login />} />
-            {/* Protected routes */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/" element={<Home />} />
-              <Route path="/c/:sessionId" element={<Home />} />
-            </Route>
-          </Routes>
+          <AppRoutes />
         </ChatProvider>
       </ChatSessionProvider>
     </BrowserRouter>

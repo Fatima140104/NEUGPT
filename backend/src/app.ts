@@ -1,5 +1,4 @@
 import express from "express";
-import itemRoutes from "./routes/itemRoutes";
 import { errorHandler } from "./middlewares/errorHandler";
 import cors from "cors";
 import morgan from "morgan";
@@ -18,7 +17,6 @@ app.use(cors());
 app.use(morgan("dev"));
 
 // Define routes
-app.use("/api/items", itemRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/sessions", sessionRoutes);
 app.use("/api/chats", chatRoutes);
