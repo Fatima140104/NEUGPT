@@ -84,3 +84,40 @@ export const deleteSession = async (
     next(err);
   }
 };
+
+// Function để update title của session
+export const updateSessionTitle = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { title } = req.body;
+    const userId = (req as any).user?.id;
+    
+    if (!userId) {
+      return res.status(401).json({ message: "User not authenticated" });
+    }
+    
+    if (!title || title.trim() === "") {
+      return res.status(400).json({ message: "Title is required" });
+    }
+
+    // Kiểm tra session có thuộc về user không
+    const session = await Session.findOne({ _id: req.params.id, user: userId });
+    if (!session) {
+      return res.status(404).json({ message: "Session not found or unauthorized" });
+    }
+
+    // Update title
+    const updatedSession = await Session.findByIdAndUpdate(
+      req.params.id, 
+      { title: title.trim() }, 
+      { new: true }
+    );
+    
+    res.json(updatedSession);
+  } catch (err) {
+    next(err);
+  }
+};

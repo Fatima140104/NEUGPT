@@ -6,7 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Paperclip, Settings2, Mic } from "lucide-react";
 import { useAuthFetch } from "@/hooks/useAuthFetch";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { getAvailableModels, type AIModel } from "@/config/models";
 
 export const ChatForm: React.FC = () => {
@@ -14,7 +20,7 @@ export const ChatForm: React.FC = () => {
   const [selectedModel, setSelectedModel] = useState<AIModel | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { state, dispatch } = useChat();
-  const { state: sessionState, addSession, selectSession } = useChatSession();
+  const { state: sessionState, addSession, selectSession, refreshSession } = useChatSession();
   const [error, setError] = useState<string | null>(null);
   const authFetch = useAuthFetch();
   const navigate = useNavigate();
@@ -32,6 +38,7 @@ export const ChatForm: React.FC = () => {
     if (!message.trim() || state.isLoading) return;
 
     let currentSessionId = sessionState.selectedSessionId;
+    let isNewSession = false;
 
     try {
       if (!currentSessionId || currentSessionId === "new") {
@@ -40,6 +47,7 @@ export const ChatForm: React.FC = () => {
           throw new Error("Không thể tạo hoặc lấy ID của cuộc trò chuyện mới.");
         }
         currentSessionId = newSession._id;
+        isNewSession = true;
         if (typeof currentSessionId === "string") {
           selectSession(currentSessionId);
         }
@@ -76,6 +84,13 @@ export const ChatForm: React.FC = () => {
         throw new Error("Không thể tải lại tin nhắn");
       const messages = fetchRes.data;
       dispatch({ type: "SET_MESSAGES", payload: messages });
+
+      // Nếu là tin nhắn đầu tiên (session mới), đợi 3 giây rồi refresh title
+      if (isNewSession && currentSessionId) {
+        setTimeout(() => {
+          refreshSession(currentSessionId as string);
+        }, 3000); // Đợi 3 giây để backend generate title
+      }
     } catch (error: any) {
       setError(error.message);
     } finally {
@@ -103,7 +118,7 @@ export const ChatForm: React.FC = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full flex flex-col items-center px-2 pb-4 pt-2"
+      className="w-full flex flex-col items-center pr-4 pb-4 pt-2"
       autoComplete="off"
     >
       <div className="shadow-lg flex w-full max-w-3xl flex-col mx-auto items-center justify-center overflow-clip rounded-[28px] bg-background dark:bg-[#303030]">
@@ -157,25 +172,28 @@ export const ChatForm: React.FC = () => {
                   </span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="start">
                 <DropdownMenuLabel>Model</DropdownMenuLabel>
                 {availableModels.map((model) => (
                   <DropdownMenuItem
                     key={model.id}
                     onClick={() => setSelectedModel(model)}
-                    className={selectedModel?.id === model.id ? "bg-accent" : ""}
+                    className={
+                      selectedModel?.id === model.id ? "bg-accent" : ""
+                    }
                   >
                     <div className="flex flex-col">
                       <p className="font-medium">{model.name}</p>
                       {model.description && (
-                        <p className="text-xs text-muted-foreground">{model.description}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {model.description}
+                        </p>
                       )}
                     </div>
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
-
           </div>
           <div className="flex gap-1">
             <Button

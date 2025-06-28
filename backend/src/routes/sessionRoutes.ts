@@ -5,6 +5,7 @@ import {
   getSessionById,
   updateSession,
   deleteSession,
+  updateSessionTitle,
 } from "../controllers/sessionController";
 import { mockAuthMiddleware } from "../middlewares/authenticationHandler";
 
@@ -22,6 +23,7 @@ router.get("/", asyncHandler(getSessions));
 router.get("/:id", asyncHandler(getSessionById));
 router.post("/", asyncHandler(createSession));
 router.put("/:id", asyncHandler(updateSession));
+router.put("/:id/title", asyncHandler(updateSessionTitle));
 router.delete("/:id", asyncHandler(deleteSession));
 
 export default router;

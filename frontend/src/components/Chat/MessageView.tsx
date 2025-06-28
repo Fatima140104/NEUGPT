@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useChat } from "../../providers/ChatContext";
 import useMessageScrolling from "@/hooks/useMessageScrolling";
 import type { Message } from "../../providers/ChatContext";
@@ -9,11 +9,73 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import loadingMessageAnimation from "@/assets/loading-message-animation.webm";
+import HoverButtons from "./HoverButtons";
+import type { HoverButtonConfig } from "../../common/types";
+import { Check, Copy } from "lucide-react";
+
+function useCopyToClipboard() {
+  const [isCopied, setIsCopied] = useState(false);
+  const copy = (text: string) => {
+    if (navigator && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 3000);
+    }
+  };
+  return { isCopied, copy };
+}
 
 const MessageItem: React.FC<{ message: Message }> = ({ message }) => {
   const isUser = message.role === "user";
+  const { isCopied, copy } = useCopyToClipboard();
+
+  // Button configs
+  const copyBtn: HoverButtonConfig = {
+    type: "copy",
+    tooltip: isCopied ? "Copied!" : "Copy",
+    onClick: () => copy(message.content),
+    active: isCopied,
+    icon: isCopied ? <Check size={18} /> : <Copy size={18} />,
+  };
+  const editBtn: HoverButtonConfig = {
+    type: "edit",
+    tooltip: "Edit",
+    onClick: () => {},
+  };
+  const likeBtn: HoverButtonConfig = {
+    type: "like",
+    tooltip: "Like",
+    onClick: () => {},
+  };
+  const dislikeBtn: HoverButtonConfig = {
+    type: "dislike",
+    tooltip: "Dislike",
+    onClick: () => {},
+  };
+  const regenerateBtn: HoverButtonConfig = {
+    type: "regenerate",
+    tooltip: "Regenerate",
+    onClick: () => {},
+  };
+  const shareBtn: HoverButtonConfig = {
+    type: "share",
+    tooltip: "Share",
+    onClick: () => {},
+  };
+
+  const assistantButtons = [
+    copyBtn,
+    likeBtn,
+    dislikeBtn,
+    editBtn,
+    regenerateBtn,
+    shareBtn,
+  ];
+  const userButtons = [copyBtn, editBtn];
+
   return (
-    <div className="max-w-3xl mx-auto w-full flex">
+    <div className="max-w-3xl mx-auto w-full flex flex-col gap-2 group">
       <div
         className={cn(
           "flex w-full",
@@ -25,7 +87,7 @@ const MessageItem: React.FC<{ message: Message }> = ({ message }) => {
           className={cn(
             "relative rounded-3xl py-2.5 text-base break-words",
             isUser
-              ? "max-w-[70%] bg-[#313031] text-white items-end px-5"
+              ? "max-w-[70%] bg-[#313031] text-white items-end px-5 group"
               : "w-full"
           )}
         >
@@ -38,6 +100,16 @@ const MessageItem: React.FC<{ message: Message }> = ({ message }) => {
           )}
         </div>
       </div>
+      {/* HoverButtons */}
+      {isUser ? (
+        <div className="flex justify-end opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 group-hover:flex transition-all duration-500">
+          <HoverButtons buttons={userButtons} />
+        </div>
+      ) : (
+        <div className="flex justify-start">
+          <HoverButtons buttons={assistantButtons} />
+        </div>
+      )}
     </div>
   );
 };
@@ -59,7 +131,7 @@ export const MessageView: React.FC = () => {
       className="relative flex-1 overflow-hidden overflow-y-auto -mb-(--composer-overlap-px) [--composer-overlap-px:24px] z-10"
       ref={scrollableRef}
     >
-      <div className="space-y-4 pb-4 pl-4">
+      <div className="space-y-4 pt-5 pb-20">
         {messages.map((message) => (
           <MessageItem
             key={(message as any)._id || message.id}
@@ -73,9 +145,16 @@ export const MessageView: React.FC = () => {
           />
         ))}
         {isLoading && (
-          <div className="max-w-3xl mx-auto w-full flex justify-start">
+          <div className="max-w-3xl pl=4 mx-auto w-full flex justify-start">
             <div className="relative max-w-[70%] rounded-3xl px-5 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100">
-              <span>...</span>
+              <video
+                src={loadingMessageAnimation}
+                autoPlay
+                loop
+                muted
+                playsInline
+                style={{ width: 30, height: 30, objectFit: "contain" }}
+              />
             </div>
           </div>
         )}
