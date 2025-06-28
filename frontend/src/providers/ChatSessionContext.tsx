@@ -82,6 +82,7 @@ interface ChatSessionContextType {
   addSession: (title?: string) => Promise<any>;
   updateSession: (session: ChatSession) => void;
   deleteSession: (id: string) => void;
+  refreshSession: (id: string) => void;
 }
 
 const ChatSessionContext = createContext<ChatSessionContextType | undefined>(
@@ -188,6 +189,29 @@ export const ChatSessionProvider: React.FC<{ children: ReactNode }> = ({
     [authFetch]
   );
 
+  // Refresh a specific session to get updated title
+  const refreshSession = useCallback(
+    async (id: string) => {
+      try {
+        const res = await authFetch(`/sessions/${id}`);
+        if (res === null) return;
+        if (res.status !== 200) throw new Error("Failed to fetch session");
+        const updatedSession = await res.data;
+        dispatch({
+          type: "UPDATE_SESSION",
+          payload: {
+            _id: updatedSession._id || updatedSession.id,
+            title: updatedSession.title || "Cuộc trò chuyện",
+            timestamp: new Date(updatedSession.createdAt || updatedSession.timestamp),
+          },
+        });
+      } catch (err) {
+        console.error("Failed to refresh session:", err);
+      }
+    },
+    [authFetch]
+  );
+
   // fetch sessions on mount
   useEffect(() => {
     if (getToken()) {
@@ -208,6 +232,7 @@ export const ChatSessionProvider: React.FC<{ children: ReactNode }> = ({
         addSession,
         updateSession,
         deleteSession,
+        refreshSession,
       }}
     >
       {children}

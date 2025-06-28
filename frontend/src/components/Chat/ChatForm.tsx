@@ -20,7 +20,7 @@ export const ChatForm: React.FC = () => {
   const [selectedModel, setSelectedModel] = useState<AIModel | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { state, dispatch } = useChat();
-  const { state: sessionState, addSession, selectSession } = useChatSession();
+  const { state: sessionState, addSession, selectSession, refreshSession } = useChatSession();
   const [error, setError] = useState<string | null>(null);
   const authFetch = useAuthFetch();
   const navigate = useNavigate();
@@ -38,6 +38,7 @@ export const ChatForm: React.FC = () => {
     if (!message.trim() || state.isLoading) return;
 
     let currentSessionId = sessionState.selectedSessionId;
+    let isNewSession = false;
 
     try {
       if (!currentSessionId || currentSessionId === "new") {
@@ -46,6 +47,7 @@ export const ChatForm: React.FC = () => {
           throw new Error("Không thể tạo hoặc lấy ID của cuộc trò chuyện mới.");
         }
         currentSessionId = newSession._id;
+        isNewSession = true;
         if (typeof currentSessionId === "string") {
           selectSession(currentSessionId);
         }
@@ -82,6 +84,13 @@ export const ChatForm: React.FC = () => {
         throw new Error("Không thể tải lại tin nhắn");
       const messages = fetchRes.data;
       dispatch({ type: "SET_MESSAGES", payload: messages });
+
+      // Nếu là tin nhắn đầu tiên (session mới), đợi 3 giây rồi refresh title
+      if (isNewSession && currentSessionId) {
+        setTimeout(() => {
+          refreshSession(currentSessionId as string);
+        }, 3000); // Đợi 3 giây để backend generate title
+      }
     } catch (error: any) {
       setError(error.message);
     } finally {
