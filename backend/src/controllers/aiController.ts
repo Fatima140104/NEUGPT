@@ -3,7 +3,12 @@ import Chat from "../models/chat";
 import Session from "../models/session";
 import { OpenAI } from "openai";
 import config from "../config/config";
-import { isModelValid, getModelById, getDefaultModel, getAvailableModels } from "../config/models";
+import {
+  isModelValid,
+  getModelById,
+  getDefaultModel,
+  getAvailableModels,
+} from "../config/models";
 
 const openai = new OpenAI({ apiKey: config.openaiApiKey });
 
@@ -15,19 +20,22 @@ const generateSessionTitle = async (message: string): Promise<string> => {
       messages: [
         {
           role: "system",
-          content: "You are an AI assistant that helps generate concise conversation titles. Create a short title (no more than 30 characters) based on the user's first message. Return only the title, no explanations. The title should be in the same language as the user's message (english or vietnamese)."
+          content:
+            "You are an AI assistant that helps generate concise conversation titles. Create a short title (no more than 30 characters) based on the user's first message. Return only the title, no explanations. The title should be in the same language as the user's message (english or vietnamese).",
         },
         {
           role: "user",
-          content: `Create a title for the conversation starting with the message: "${message}"`
-        }
+          content: `Create a title for the conversation starting with the message: "${message}"`,
+        },
       ],
       max_tokens: 50,
       temperature: 0.7,
     });
-    
-    let title = completion.choices[0]?.message?.content?.trim() || message.substring(0, 30);
-    
+
+    let title =
+      completion.choices[0]?.message?.content?.trim() ||
+      message.substring(0, 30);
+
     // Loại bỏ dấu ngoặc kép ở đầu và cuối nếu có
     if (title.startsWith('"') && title.endsWith('"')) {
       title = title.slice(1, -1);
@@ -35,7 +43,7 @@ const generateSessionTitle = async (message: string): Promise<string> => {
     if (title.startsWith("'") && title.endsWith("'")) {
       title = title.slice(1, -1);
     }
-    
+
     return title.trim();
   } catch (error) {
     console.error("Error generating session title:", error);
@@ -45,7 +53,10 @@ const generateSessionTitle = async (message: string): Promise<string> => {
 };
 
 // Function để update session title (chạy background)
-const updateSessionTitleAsync = async (sessionId: string, message: string): Promise<void> => {
+const updateSessionTitleAsync = async (
+  sessionId: string,
+  message: string
+): Promise<void> => {
   try {
     const title = await generateSessionTitle(message);
     await Session.findByIdAndUpdate(sessionId, { title });
@@ -56,51 +67,61 @@ const updateSessionTitleAsync = async (sessionId: string, message: string): Prom
 };
 
 export const chatWithAI = async (req: Request, res: Response) => {
+  //Extract and validate request data
   const userId = (req as any).user?.id;
   const sessionId = req.body.sessionId || "";
   const { message, model: requestedModel } = req.body;
 
-  // Validate basic requirements
+  // Validate required fields
   if (!sessionId) {
-    return res.status(400).json({ error: "sessionId is required" });
+    res.status(400).write("event: error\ndata: sessionId is required\n\n");
+    return res.end();
   }
   if (!message) {
-    return res.status(400).json({ error: "Message is required" });
+    res.status(400).write("event: error\ndata: Message is required\n\n");
+    return res.end();
   }
   if (!userId) {
-    return res.status(401).json({ error: "User not authenticated" });
+    res.status(401).write("event: error\ndata: User not authenticated\n\n");
+    return res.end();
   }
 
-  // Validate and set model
+  // Model selection and validation
   let selectedModel = requestedModel;
-  
-  // Use default model if no model specified
   if (!selectedModel) {
     selectedModel = getDefaultModel().id;
-    console.log(`No model specified, using default: ${selectedModel}`);
   } else {
-    // Validate the requested model
     if (!isModelValid(selectedModel)) {
       const modelInfo = getModelById(selectedModel);
       if (!modelInfo) {
-        return res.status(400).json({ 
-          error: `Invalid model: ${selectedModel}. Model not found.` 
-        });
+        res
+          .status(400)
+          .write(
+            `event: error\ndata: Invalid model: ${selectedModel}. Model not found.\n\n`
+          );
+        return res.end();
       } else if (!modelInfo.isAvailable) {
-        return res.status(400).json({ 
-          error: `Model ${selectedModel} is currently not available.` 
-        });
+        res
+          .status(400)
+          .write(
+            `event: error\ndata: Model ${selectedModel} is currently not available.\n\n`
+          );
+        return res.end();
       }
     }
-    // console.log(`Using requested model: ${selectedModel}`);
   }
 
+  // Set up SSE response headers
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+  res.flushHeaders && res.flushHeaders();
+
   try {
-    // Kiểm tra xem đây có phải tin nhắn đầu tiên không
+    // Store user message and trigger session title generation if first message
     const existingChats = await Chat.find({ session: sessionId });
     const isFirstMessage = existingChats.length === 0;
 
-    // Store user message
     await Chat.create({
       session: sessionId,
       user: userId,
@@ -109,52 +130,61 @@ export const chatWithAI = async (req: Request, res: Response) => {
       timestamp: new Date(),
     });
 
-    // Nếu là tin nhắn đầu tiên, bắt đầu generate title song song
     if (isFirstMessage) {
-      // Chạy generate title ở background, không đợi kết quả
-      updateSessionTitleAsync(sessionId, message).catch(error => {
+      updateSessionTitleAsync(sessionId, message).catch((error) => {
         console.error("Background title generation failed:", error);
       });
     }
 
-    // Lấy lịch sử chat 10 tin nhắn gần nhất để có context
+    // Retrieve chat history for context
     const chatHistory = await Chat.find({ session: sessionId })
       .sort({ timestamp: 1 })
-      .limit(10)
-      .select('role content');
+      // No need for limit, use cached context api model
+      // .limit(10)
+      .select("role content");
 
-    // Tạo messages array với system prompt và lịch sử
+    // Prepare messages for OpenAI API
     const messages: any[] = [];
-
-    // Thêm lịch sử chat (bao gồm tin nhắn vừa lưu)
-    chatHistory.forEach(chat => {
+    // Add chat history to messages
+    chatHistory.forEach((chat) => {
       messages.push({
         role: chat.role,
-        content: chat.content
+        content: chat.content,
       });
     });
 
-    // Call OpenAI API cho response chính
-    const completion = await openai.chat.completions.create({
-      model: selectedModel,
-      messages: messages,
-    });
-    const aiContent = completion.choices[0]?.message?.content || "";
+    // Call OpenAI API and stream response to client
+    let fullContent = "";
+    const completion = await openai.chat.completions.create(
+      {
+        model: selectedModel,
+        messages: messages,
+        stream: true,
+      },
+      { signal: (req as any).abortSignal }
+    );
 
-    // Store assistant message
+    for await (const chunk of completion) {
+      const content = chunk.choices?.[0]?.delta?.content || "";
+      if (content) {
+        fullContent += content;
+        res.write(`data: ${JSON.stringify(content)}\n\n`);
+      }
+    }
+    // Store assistant message after streaming is done
     await Chat.create({
       session: sessionId,
       user: userId,
       role: "assistant",
-      content: aiContent,
+      content: fullContent,
       timestamp: new Date(),
     });
-
-    res.json({ ChatResponse: aiContent });
-  } catch (err) {
-    console.error("Chat error:", err);
-    res
-      .status(500)
-      .json({ error: "Failed to get AI response or store messages" });
+    res.write("event: end\ndata: [DONE]\n\n");
+    res.end();
+  } catch (err: any) {
+    // Error handling: stream error event to client
+    console.error("Streaming chat error:", err);
+    res.write(`event: error\ndata: ${JSON.stringify(err?.message || err)}\n\n`);
+    res.end();
   }
 };

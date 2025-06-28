@@ -15,6 +15,7 @@ interface ChatState {
   isSubmitting: boolean;
   isLoading: boolean;
   selectedChat?: string | null;
+  isAwaitingFirstChunk?: boolean;
 }
 
 type ChatAction =
@@ -23,7 +24,8 @@ type ChatAction =
   | { type: "CLEAR_MESSAGES" }
   | { type: "SET_MESSAGES"; payload: Message[] }
   | { type: "SET_ABORT_SCROLL"; payload: boolean }
-  | { type: "SET_IS_SUBMITTING"; payload: boolean };
+  | { type: "SET_IS_SUBMITTING"; payload: boolean }
+  | { type: "SET_AWAITING_FIRST_CHUNK"; payload: boolean };
 
 const initialState: ChatState = {
   messageTree: [],
@@ -32,6 +34,7 @@ const initialState: ChatState = {
   isSubmitting: false,
   isLoading: false,
   selectedChat: null,
+  isAwaitingFirstChunk: false,
 };
 
 const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
@@ -65,6 +68,11 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
       return {
         ...state,
         isSubmitting: action.payload,
+      };
+    case "SET_AWAITING_FIRST_CHUNK":
+      return {
+        ...state,
+        isAwaitingFirstChunk: action.payload,
       };
     default:
       return state;
