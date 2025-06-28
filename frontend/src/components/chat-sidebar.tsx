@@ -43,6 +43,44 @@ import { useChatSession } from "../providers/ChatSessionContext";
 import { useNavigate } from "react-router-dom";
 import { getUserFromToken, removeToken } from "@/lib/auth";
 
+function SessionTitleWithTyping({
+  title,
+  triggerTyping,
+}: {
+  title: string;
+  triggerTyping: boolean;
+}) {
+  const [displayedTitle, setDisplayedTitle] = React.useState(title);
+  const typingTimeout = React.useRef<NodeJS.Timeout | null>(null);
+
+  React.useEffect(() => {
+    if (!triggerTyping) {
+      setDisplayedTitle(title);
+      return;
+    }
+    let i = 0;
+    if (typingTimeout.current) clearTimeout(typingTimeout.current);
+    function typeNext() {
+      setDisplayedTitle(title.slice(0, i + 1));
+      i++;
+      if (i < title.length) {
+        typingTimeout.current = setTimeout(typeNext, 30);
+      }
+    }
+    setDisplayedTitle("");
+    typingTimeout.current = setTimeout(typeNext, 30);
+    return () => {
+      if (typingTimeout.current) clearTimeout(typingTimeout.current);
+    };
+  }, [title, triggerTyping]);
+
+  return (
+    <span className="font-medium text-sm truncate flex-1">
+      {displayedTitle}
+    </span>
+  );
+}
+
 function ChatSidebar() {
   const navigate = useNavigate();
   const { state, selectSession, deleteSession } = useChatSession();
@@ -53,6 +91,9 @@ function ChatSidebar() {
   const [menuOpenSessionId, setMenuOpenSessionId] = React.useState<
     string | null
   >(null);
+  const [updatedSessionId, setUpdatedSessionId] = React.useState<string | null>(
+    null
+  );
 
   const user = getUserFromToken();
 
@@ -64,6 +105,15 @@ function ChatSidebar() {
     .filter((session) =>
       session.title?.toLowerCase().includes(searchQuery.toLowerCase())
     );
+
+  // Animate session title when updated
+  React.useEffect(() => {
+    if (state.lastUpdatedSessionId) {
+      setUpdatedSessionId(state.lastUpdatedSessionId);
+      const timeout = setTimeout(() => setUpdatedSessionId(null), 600);
+      return () => clearTimeout(timeout);
+    }
+  }, [state.lastUpdatedSessionId]);
 
   const handleNewChat = () => {
     selectSession("new");
@@ -136,10 +186,10 @@ function ChatSidebar() {
                       className="w-full text-left"
                     >
                       <div className="flex items-center justify-between w-full mb-1">
-                        <span className="font-medium text-sm truncate flex-1">
-                          {session.title || "(Không có tiêu đề)"}
-                        </span>
-
+                        <SessionTitleWithTyping
+                          title={session.title || "(Không có tiêu đề)"}
+                          triggerTyping={updatedSessionId === session._id}
+                        />
                         {hoveredSessionId === session._id && (
                           <DropdownMenu
                             open={menuOpenSessionId === session._id}

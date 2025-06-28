@@ -20,6 +20,7 @@ interface ChatSessionState {
   selectedSessionId: string | null;
   loading: boolean;
   error: string | null;
+  lastUpdatedSessionId?: string | null;
 }
 
 type ChatSessionAction =
@@ -36,6 +37,7 @@ const initialState: ChatSessionState = {
   selectedSessionId: null,
   loading: false,
   error: null,
+  lastUpdatedSessionId: null,
 };
 
 const chatSessionReducer = (
@@ -53,6 +55,7 @@ const chatSessionReducer = (
         sessions: state.sessions.map((s) =>
           s._id === action.payload._id ? action.payload : s
         ),
+        lastUpdatedSessionId: action.payload._id,
       };
     case "DELETE_SESSION":
       return {
@@ -62,6 +65,7 @@ const chatSessionReducer = (
           state.selectedSessionId === action.payload
             ? "new"
             : state.selectedSessionId,
+        lastUpdatedSessionId: null,
       };
     case "SELECT_SESSION":
       return { ...state, selectedSessionId: action.payload };
@@ -202,7 +206,9 @@ export const ChatSessionProvider: React.FC<{ children: ReactNode }> = ({
           payload: {
             _id: updatedSession._id || updatedSession.id,
             title: updatedSession.title || "Cuộc trò chuyện",
-            timestamp: new Date(updatedSession.createdAt || updatedSession.timestamp),
+            timestamp: new Date(
+              updatedSession.createdAt || updatedSession.timestamp
+            ),
           },
         });
       } catch (err) {
