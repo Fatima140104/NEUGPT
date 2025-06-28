@@ -6,7 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Paperclip, Settings2, Mic } from "lucide-react";
 import { useAuthFetch } from "@/hooks/useAuthFetch";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { getAvailableModels, type AIModel } from "@/config/models";
 
 export const ChatForm: React.FC = () => {
@@ -103,7 +109,7 @@ export const ChatForm: React.FC = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full flex flex-col items-center px-2 pb-4 pt-2"
+      className="w-full flex flex-col items-center pr-4 pb-4 pt-2"
       autoComplete="off"
     >
       <div className="shadow-lg flex w-full max-w-3xl flex-col mx-auto items-center justify-center overflow-clip rounded-[28px] bg-background dark:bg-[#303030]">
@@ -157,25 +163,28 @@ export const ChatForm: React.FC = () => {
                   </span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="start">
                 <DropdownMenuLabel>Model</DropdownMenuLabel>
                 {availableModels.map((model) => (
                   <DropdownMenuItem
                     key={model.id}
                     onClick={() => setSelectedModel(model)}
-                    className={selectedModel?.id === model.id ? "bg-accent" : ""}
+                    className={
+                      selectedModel?.id === model.id ? "bg-accent" : ""
+                    }
                   >
                     <div className="flex flex-col">
                       <p className="font-medium">{model.name}</p>
                       {model.description && (
-                        <p className="text-xs text-muted-foreground">{model.description}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {model.description}
+                        </p>
                       )}
                     </div>
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
-
           </div>
           <div className="flex gap-1">
             <Button

@@ -173,17 +173,16 @@ pre[class*="language-"] {
   hyphens: none;
   tab-size: 4;
   text-align: left;
-  white-space: pre;
-  word-break: normal;
+  white-space: pre-wrap;
+  word-break: break-all;
   word-spacing: normal;
   scrollbar-color: #666 #201c29;
   background: none;
-  white-space: pre;
   -webkit-overflow-scrolling: touch;
   overflow-x: scroll;
   display: block;
   max-width: 100%;
-  min-width: 100px;
+  min-width: 75px;
   font-size: 14px;
   padding: 15px 20px 12px 22px;
   line-height: 1.75;
@@ -258,7 +257,6 @@ body,
 
 /* Markdown */
 .markdown {
-  max-width: none;
   font-size: var(--markdown-font-size, var(--font-size-base));
   line-height: calc(
     28px * var(--markdown-font-size, var(--font-size-base)) /
@@ -317,7 +315,7 @@ body,
 .markdown ol,
 .markdown ul {
   list-style-position: outside;
-  margin-top: 1em;
+  /* margin-top: 1em; */
   margin-bottom: 1em;
   padding-left: 2em;
 }
@@ -338,7 +336,7 @@ body,
 .prose ol > li,
 .markdown ol > li {
   position: relative;
-  padding-left: 0.375em;
+  /* padding-left: 0.375em; */
 }
 
 .prose ol > li::marker,
@@ -414,7 +412,7 @@ body,
 /* Tailwind CSS Prose */
 .prose {
   color: var(--tw-prose-body);
-  max-width: 99%;
+  max-width: 99.9%;
   font-size: var(--markdown-font-size, var(--font-size-base));
   line-height: calc(
     28px * var(--markdown-font-size, var(--font-size-base)) /
@@ -697,7 +695,7 @@ body,
 }
 .prose :where(.prose > ul > li p):not(:where([class~="not-prose"] *)) {
   margin-bottom: 0.75em;
-  margin-top: 0.75em;
+  /* margin-top: 0.75em; */
 }
 .prose
   :where(.prose > ul > li > :first-child):not(:where([class~="not-prose"] *)) {

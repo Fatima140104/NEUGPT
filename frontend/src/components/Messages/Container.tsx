@@ -9,7 +9,7 @@ const Container = ({
   //   message?: TMessage;
 }) => (
   <div
-    className="markdown prose text-message flex min-h-[20px] flex-col items-start break-words mx-auto"
+    className="markdown prose text-message flex min-h-[20px] flex-col items-start break-words"
     dir="auto"
   >
     {/* {message?.isCreatedByUser === true && <Files message={message} />} */}
