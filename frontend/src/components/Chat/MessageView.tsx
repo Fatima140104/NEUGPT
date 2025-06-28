@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useChat } from "../../providers/ChatContext";
 import useMessageScrolling from "@/hooks/useMessageScrolling";
 import type { Message } from "../../providers/ChatContext";
@@ -9,7 +9,7 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import loadingMessageAnimation from "@/assets/loading-message-animation.webm";
+import waitingResponseAnimation from "@/assets/loading-message-animation.webm";
 import HoverButtons from "./HoverButtons";
 import type { HoverButtonConfig } from "../../common/types";
 import { Check, Copy } from "lucide-react";
@@ -126,29 +126,45 @@ export const MessageView: React.FC = () => {
     (state: RootState) => state.settings.scrollButtonPreference
   );
 
+  // Fade-in animation state
+  const [animateIn, setAnimateIn] = useState(false);
+  useEffect(() => {
+    if (!isLoading && messages.length > 0) {
+      setAnimateIn(false);
+      setTimeout(() => setAnimateIn(true), 50);
+    }
+  }, [isLoading, messages.length]);
+
   return (
     <div
       className="relative flex-1 overflow-hidden overflow-y-auto -mb-(--composer-overlap-px) [--composer-overlap-px:24px] z-10"
       ref={scrollableRef}
     >
-      <div className="space-y-4 pt-5 pb-20">
-        {messages.map((message) => (
-          <MessageItem
+      <div className="space-y-4 pt-5 pb-20 px-4">
+        {messages.map((message, idx) => (
+          <div
             key={(message as any)._id || message.id}
-            message={{
-              ...message,
-              timestamp:
-                message.timestamp instanceof Date
-                  ? message.timestamp
-                  : new Date(message.timestamp),
-            }}
-          />
+            className={`transition-opacity duration-700 ${
+              animateIn ? "opacity-100" : "opacity-0"
+            }`}
+            style={{ transitionDelay: `${idx * 40}ms` }}
+          >
+            <MessageItem
+              message={{
+                ...message,
+                timestamp:
+                  message.timestamp instanceof Date
+                    ? message.timestamp
+                    : new Date(message.timestamp),
+              }}
+            />
+          </div>
         ))}
         {isLoading && (
-          <div className="max-w-3xl pl=4 mx-auto w-full flex justify-start">
+          <div className="max-w-3xl mx-auto w-full flex justify-start">
             <div className="relative max-w-[70%] rounded-3xl px-5 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100">
               <video
-                src={loadingMessageAnimation}
+                src={waitingResponseAnimation}
                 autoPlay
                 loop
                 muted

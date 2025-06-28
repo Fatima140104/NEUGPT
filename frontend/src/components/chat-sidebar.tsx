@@ -7,11 +7,11 @@ import {
   Search,
   Settings,
   User,
-  MoreHorizontal,
   Edit3,
   Trash2,
   Archive,
   Share,
+  MoreVertical,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -75,7 +75,14 @@ function SessionTitleWithTyping({
   }, [title, triggerTyping]);
 
   return (
-    <span className="font-medium text-sm truncate flex-1">
+    <span
+      className="font-medium text-sm flex-1 relative overflow-hidden inline-block whitespace-nowrap"
+      style={{
+        maskImage: "linear-gradient(to right, black 85%, transparent 100%)",
+        WebkitMaskImage:
+          "linear-gradient(to right, black 85%, transparent 100%)",
+      }}
+    >
       {displayedTitle}
     </span>
   );
@@ -175,22 +182,24 @@ function ChatSidebar() {
                   key={session._id}
                   className="group"
                   onMouseEnter={() => setHoveredSessionId(session._id)}
+                  onMouseLeave={() => setHoveredSessionId(null)}
                 >
                   <SidebarMenuButton
                     asChild
                     isActive={state.selectedSessionId === session._id}
-                    className="h-auto p-3  items-start"
+                    className="h-auto p-3 items-start"
                   >
                     <button
                       onClick={() => handleSelectSession(session._id)}
                       className="w-full text-left"
                     >
-                      <div className="flex items-center justify-between w-full mb-1">
+                      <div className="flex items-center justify-between w-full">
                         <SessionTitleWithTyping
                           title={session.title || "(Không có tiêu đề)"}
                           triggerTyping={updatedSessionId === session._id}
                         />
-                        {hoveredSessionId === session._id && (
+                        {(hoveredSessionId === session._id ||
+                          menuOpenSessionId === session._id) && (
                           <DropdownMenu
                             open={menuOpenSessionId === session._id}
                             onOpenChange={(open) =>
@@ -199,8 +208,8 @@ function ChatSidebar() {
                           >
                             <DropdownMenuTrigger asChild>
                               <span>
-                                <MoreHorizontal
-                                  className="opacity-50 transition-opacity duration-200 ml-1 cursor-pointer"
+                                <MoreVertical
+                                  className="opacity-50 transition-opacity duration-200 ml-1 cursor-pointer h-4 w-4"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     setMenuOpenSessionId(session._id);
