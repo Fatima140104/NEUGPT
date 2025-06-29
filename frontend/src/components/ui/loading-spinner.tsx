@@ -1,6 +1,8 @@
 import React from "react";
 
-export const LoadingSpinner: React.FC = () => (
+export const LoadingSpinner: React.FC<{ loadingTitle?: string }> = ({
+  loadingTitle,
+}) => (
   <div className="flex h-full items-center justify-center py-4">
     <svg
       className="animate-spin h-6 w-6 text-gray-500"
@@ -22,6 +24,6 @@ export const LoadingSpinner: React.FC = () => (
         d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
       ></path>
     </svg>
-    <span className="ml-2 text-gray-500">Loading...</span>
+    <span className="ml-2 text-gray-500">{loadingTitle || "Loading"}...</span>
   </div>
 );

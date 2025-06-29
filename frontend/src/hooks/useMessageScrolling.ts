@@ -12,6 +12,7 @@ export default function useMessageScrolling(
   const scrollableRef = useRef<HTMLDivElement | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
+  const [isAtBottom, setIsAtBottom] = useState(true);
   const { dispatch } = useChat();
   const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -39,7 +40,9 @@ export default function useMessageScrolling(
     const handleScroll = () => {
       if (!scrollableRef.current || !messagesEndRef.current) return;
       const { scrollTop, scrollHeight, clientHeight } = scrollableRef.current;
-      setShowScrollButton(scrollHeight - scrollTop - clientHeight > 100);
+      const atBottom = scrollHeight - scrollTop - clientHeight < 100;
+      setIsAtBottom(atBottom);
+      setShowScrollButton(!atBottom);
     };
     const ref = scrollableRef.current;
     if (ref) {
@@ -48,10 +51,12 @@ export default function useMessageScrolling(
     }
   }, []);
 
-  // Auto-scroll to bottom when messages change or loading ends
+  // Auto-scroll to bottom when messages change or loading ends, but only if user is at bottom
   useEffect(() => {
-    scrollToBottom && scrollToBottom();
-  }, [messagesTree, isLoading, scrollToBottom]);
+    if (isAtBottom && scrollToBottom) {
+      scrollToBottom();
+    }
+  }, [messagesTree, isLoading, scrollToBottom, isAtBottom]);
 
   return {
     scrollableRef,
@@ -59,5 +64,6 @@ export default function useMessageScrolling(
     scrollToBottom,
     handleSmoothToRef,
     showScrollButton,
+    isAtBottom,
   };
 }

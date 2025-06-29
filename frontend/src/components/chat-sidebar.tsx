@@ -12,7 +12,7 @@ import {
   Share,
   MoreVertical,
 } from "lucide-react";
-import logoNeu from "../../public/favicon.png";
+import logoNeu from "../assets/favicon.png";
 
 import { Button } from "@/components/ui/button";
 import {
