@@ -7,12 +7,13 @@ import {
   Search,
   Settings,
   User,
-  MoreHorizontal,
   Edit3,
   Trash2,
   Archive,
   Share,
+  MoreVertical,
 } from "lucide-react";
+import logoNeu from "@/assets/Logo-NEU.png";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -43,6 +44,51 @@ import { useChatSession } from "../providers/ChatSessionContext";
 import { useNavigate } from "react-router-dom";
 import { getUserFromToken, removeToken } from "@/lib/auth";
 
+function SessionTitleWithTyping({
+  title,
+  triggerTyping,
+}: {
+  title: string;
+  triggerTyping: boolean;
+}) {
+  const [displayedTitle, setDisplayedTitle] = React.useState(title);
+  const typingTimeout = React.useRef<NodeJS.Timeout | null>(null);
+
+  React.useEffect(() => {
+    if (!triggerTyping) {
+      setDisplayedTitle(title);
+      return;
+    }
+    let i = 0;
+    if (typingTimeout.current) clearTimeout(typingTimeout.current);
+    function typeNext() {
+      setDisplayedTitle(title.slice(0, i + 1));
+      i++;
+      if (i < title.length) {
+        typingTimeout.current = setTimeout(typeNext, 30);
+      }
+    }
+    setDisplayedTitle("");
+    typingTimeout.current = setTimeout(typeNext, 30);
+    return () => {
+      if (typingTimeout.current) clearTimeout(typingTimeout.current);
+    };
+  }, [title, triggerTyping]);
+
+  return (
+    <span
+      className="font-medium text-sm flex-1 relative overflow-hidden inline-block whitespace-nowrap"
+      style={{
+        maskImage: "linear-gradient(to right, black 85%, transparent 100%)",
+        WebkitMaskImage:
+          "linear-gradient(to right, black 85%, transparent 100%)",
+      }}
+    >
+      {displayedTitle}
+    </span>
+  );
+}
+
 function ChatSidebar() {
   const navigate = useNavigate();
   const { state, selectSession, deleteSession } = useChatSession();
@@ -53,6 +99,9 @@ function ChatSidebar() {
   const [menuOpenSessionId, setMenuOpenSessionId] = React.useState<
     string | null
   >(null);
+  const [updatedSessionId, setUpdatedSessionId] = React.useState<string | null>(
+    null
+  );
 
   const user = getUserFromToken();
 
@@ -64,6 +113,15 @@ function ChatSidebar() {
     .filter((session) =>
       session.title?.toLowerCase().includes(searchQuery.toLowerCase())
     );
+
+  // Animate session title when updated
+  React.useEffect(() => {
+    if (state.lastUpdatedSessionId) {
+      setUpdatedSessionId(state.lastUpdatedSessionId);
+      const timeout = setTimeout(() => setUpdatedSessionId(null), 600);
+      return () => clearTimeout(timeout);
+    }
+  }, [state.lastUpdatedSessionId]);
 
   const handleNewChat = () => {
     selectSession("new");
@@ -79,7 +137,7 @@ function ChatSidebar() {
     <Sidebar className="border-r">
       <SidebarHeader className="border-b p-4">
         <div className="flex items-center gap-2 mb-4">
-          <MessageSquare className="h-6 w-6" />
+          <img src={logoNeu} alt="NEU Logo" className="h-13 w-13 object-cover object-center rounded" />
           <span className="font-semibold text-lg">NEU GPT</span>
         </div>
         <Button
@@ -125,22 +183,24 @@ function ChatSidebar() {
                   key={session._id}
                   className="group"
                   onMouseEnter={() => setHoveredSessionId(session._id)}
+                  onMouseLeave={() => setHoveredSessionId(null)}
                 >
                   <SidebarMenuButton
                     asChild
                     isActive={state.selectedSessionId === session._id}
-                    className="h-auto p-3  items-start"
+                    className="h-auto p-3 items-start"
                   >
                     <button
                       onClick={() => handleSelectSession(session._id)}
                       className="w-full text-left"
                     >
-                      <div className="flex items-center justify-between w-full mb-1">
-                        <span className="font-medium text-sm truncate flex-1">
-                          {session.title || "(Không có tiêu đề)"}
-                        </span>
-
-                        {hoveredSessionId === session._id && (
+                      <div className="flex items-center justify-between w-full">
+                        <SessionTitleWithTyping
+                          title={session.title || "(Không có tiêu đề)"}
+                          triggerTyping={updatedSessionId === session._id}
+                        />
+                        {(hoveredSessionId === session._id ||
+                          menuOpenSessionId === session._id) && (
                           <DropdownMenu
                             open={menuOpenSessionId === session._id}
                             onOpenChange={(open) =>
@@ -149,8 +209,8 @@ function ChatSidebar() {
                           >
                             <DropdownMenuTrigger asChild>
                               <span>
-                                <MoreHorizontal
-                                  className="opacity-50 transition-opacity duration-200 ml-1 cursor-pointer"
+                                <MoreVertical
+                                  className="opacity-50 transition-opacity duration-200 ml-1 cursor-pointer h-4 w-4"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     setMenuOpenSessionId(session._id);

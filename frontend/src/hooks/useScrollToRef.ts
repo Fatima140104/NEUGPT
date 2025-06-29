@@ -26,8 +26,6 @@ export default function useScrollToRef({
     behavior: "instant" | "smooth",
     callbackFn: () => void
   ) => {
-    // Debugging:
-    // console.log(`Scrolling with behavior: ${behavior}, Time: ${new Date().toISOString()}`);
     targetRef.current?.scrollIntoView({ behavior });
     callbackFn();
   };

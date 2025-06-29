@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,11 +20,37 @@ const Header: React.FC<HeaderProps> = ({ selectedTitle, sessionId }) => {
   const { deleteSession, updateSession, state } = useChatSession();
   const session = sessionId && state.sessions.find((s) => s._id === sessionId);
   const navigate = useNavigate();
+
   // const handleArchive = async () => {
   //   if (session) {
   //     await updateSession({ ...session, archived: true });
   //   }
   // };
+
+  const [displayedTitle, setDisplayedTitle] = useState(selectedTitle);
+  const typingTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (selectedTitle === displayedTitle) return;
+
+    let i = 0;
+    if (typingTimeout.current) clearTimeout(typingTimeout.current);
+
+    function typeNext() {
+      setDisplayedTitle(selectedTitle.slice(0, i + 1));
+      i++;
+      if (i < selectedTitle.length) {
+        typingTimeout.current = setTimeout(typeNext, 30);
+      }
+    }
+
+    setDisplayedTitle("");
+    typingTimeout.current = setTimeout(typeNext, 30);
+
+    return () => {
+      if (typingTimeout.current) clearTimeout(typingTimeout.current);
+    };
+  }, [selectedTitle]);
 
   const handleDelete = async () => {
     if (sessionId) {
@@ -34,10 +60,10 @@ const Header: React.FC<HeaderProps> = ({ selectedTitle, sessionId }) => {
   };
 
   return (
-    <header className="sticky top-0 z-10 flex h-14 w-full items-center justify-between bg-white p-2 font-semibold text-text-primary dark:bg-gray-800">
+    <header className="sticky top-0 z-10 flex h-12 w-full items-center justify-between bg-white p-2 font-semibold text-text-primary dark:bg-gray-800">
       <div className="flex items-center gap-2">
         <SidebarTrigger />
-        <h1 className="font-semibold">{selectedTitle}</h1>
+        <h1 className="font-semibold">{displayedTitle}</h1>
       </div>
       <div className="flex items-center gap-2">
         <DropdownMenu>
