@@ -53,22 +53,24 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
   const codeRef = useRef<HTMLElement | null>(null);
 
   return (
-    <pre className={cn("overflow-auto w-full", classProp)}>
-      <div className="my-4 overflow-hidden rounded-md bg-code-block-background text-sm text-white/80">
+    <pre className={cn("overflow-visible!", classProp)}>
+      <div className="relative contain-inline-size my-4 overflow-hidden rounded-md bg-code-block-background text-sm text-white/80">
         <div className="not-prose">
           <CodeBar lang={lang} error={error} codeRef={codeRef} />
         </div>
-        <code
-          ref={codeRef}
-          className={cn(
-            "hljs",
-            `language-${lang}`,
-            "!whitespace-pre",
-            error && "!whitespace-pre-wrap"
-          )}
-        >
-          {codeChildren}
-        </code>
+        <div className="overflow-auto" dir="ltr">
+          <code
+            ref={codeRef}
+            className={cn(
+              "hljs",
+              `language-${lang}`,
+              "!whitespace-pre",
+              error && "!whitespace-pre-wrap"
+            )}
+          >
+            {codeChildren}
+          </code>
+        </div>
       </div>
     </pre>
   );
