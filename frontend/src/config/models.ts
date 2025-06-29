@@ -7,15 +7,21 @@ export interface AIModel {
 
 export const AI_MODELS: AIModel[] = [
   {
-    id: "gpt-3.5-turbo",
-    name: "3.5 Turbo",
-    description: "Fast and efficient for most tasks",
+    id: "gpt-4o-mini",
+    name: "GPT-4o-mini",
+    description: "Fast and cost-effective model for everyday tasks",
     isAvailable: true,
   },
   {
     id: "gpt-4o",
-    name: "4o",
-    description: "The latest and greatest model from OpenAI",
+    name: "GPT-4o",
+    description: "Advanced multimodal model with high capability",
+    isAvailable: true,
+  },
+  {
+    id: "o1-mini",
+    name: "o1-mini",
+    description: "Reasoning model optimized for coding and math",
     isAvailable: true,
   },
 ];

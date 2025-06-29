@@ -1,6 +1,8 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { chatWithAI } from "../controllers/aiController";
 import { mockAuthMiddleware } from "../middlewares/authenticationHandler";
+import { abortAIRequest } from "../middlewares/abortControllers";
+import { attachAbortController } from "../middlewares/abortMiddleware";
 
 const router = Router();
 
@@ -13,7 +15,8 @@ function asyncHandler(fn: any) {
 // Protect all chat routes with mockAuthMiddleware
 router.use(mockAuthMiddleware);
 
-// Update the route path to match the frontend's expectation
-router.post("/chat", asyncHandler(chatWithAI));
+// Attach abort controller to streaming/chat route
+router.post("/chat", attachAbortController, asyncHandler(chatWithAI));
+router.post("/abort", asyncHandler(abortAIRequest));
 
 export default router;

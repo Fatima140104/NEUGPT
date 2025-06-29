@@ -22,10 +22,11 @@ function Home() {
       if (state.selectedSessionId !== sessionId) {
         selectSession(sessionId);
       }
-    } else if (!state.selectedSessionId && state.sessions.length > 0) {
-      // If no session is selected and sessions exist, select the most recent one.
-      selectSession(state.sessions[0]._id);
     }
+    // } else if (!state.selectedSessionId && state.sessions.length > 0) {
+    //   // If no session is selected and sessions exist, select the most recent one.
+    //   selectSession(state.sessions[0]._id);
+    // }
   }, [sessionId, state.selectedSessionId, state.sessions, selectSession]);
 
   if (state.loading) {

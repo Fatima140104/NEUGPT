@@ -54,8 +54,29 @@ export const ChatView: React.FC<ChatViewProps> = ({ sessionId }) => {
     (!messageTree || messageTree.length === 0) &&
     (!sessionId || sessionId === "new");
 
+  const [showSpinner, setShowSpinner] = useState(false);
+
+  useEffect(() => {
+    let timeout: NodeJS.Timeout | null = null;
+    if (loading) {
+      setShowSpinner(false);
+      timeout = setTimeout(() => setShowSpinner(true), 500);
+    } else {
+      setShowSpinner(false);
+    }
+    return () => {
+      if (timeout) clearTimeout(timeout);
+    };
+  }, [loading]);
+
   if (loading && !isLandingPage) {
-    content = <LoadingSpinner />;
+    content = showSpinner ? (
+      <LoadingSpinner />
+    ) : (
+      <div className="flex h-full items-center justify-center">
+        <span className="block w-full h-full" />
+      </div>
+    );
   } else if (error) {
     content = (
       <div className="flex h-full items-center justify-center py-10">
