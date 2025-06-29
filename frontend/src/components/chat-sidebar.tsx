@@ -13,6 +13,7 @@ import {
   Share,
   MoreVertical,
 } from "lucide-react";
+import logoNeu from "@/assets/Logo-NEU.png";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -136,7 +137,7 @@ function ChatSidebar() {
     <Sidebar className="border-r">
       <SidebarHeader className="border-b p-4">
         <div className="flex items-center gap-2 mb-4">
-          <MessageSquare className="h-6 w-6" />
+          <img src={logoNeu} alt="NEU Logo" className="h-13 w-13 object-cover object-center rounded" />
           <span className="font-semibold text-lg">NEU GPT</span>
         </div>
         <Button
