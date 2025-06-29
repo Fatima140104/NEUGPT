@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import {
-  MessageSquare,
   Plus,
   Search,
   Settings,
@@ -13,7 +12,7 @@ import {
   Share,
   MoreVertical,
 } from "lucide-react";
-import logoNeu from "@/assets/Logo-NEU.png";
+import logoNeu from "../../public/favicon.png";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -33,11 +32,8 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarProvider,
-  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useChatSession } from "../providers/ChatSessionContext";
@@ -137,7 +133,11 @@ function ChatSidebar() {
     <Sidebar className="border-r">
       <SidebarHeader className="border-b p-4">
         <div className="flex items-center gap-2 mb-4">
-          <img src={logoNeu} alt="NEU Logo" className="h-13 w-13 object-cover object-center rounded" />
+          <img
+            src={logoNeu}
+            alt="NEU Logo"
+            className="h-13 w-13 object-cover object-center rounded"
+          />
           <span className="font-semibold text-lg">NEU GPT</span>
         </div>
         <Button
@@ -151,9 +151,9 @@ function ChatSidebar() {
         </Button>
       </SidebarHeader>
       <SidebarContent className="p-2">
-        <SidebarGroup>
+        <SidebarGroup className="sticky top-0 z-10 bg-sidebar">
           <SidebarGroupContent>
-            <div className="relative mb-4">
+            <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Tìm kiếm cuộc trò chuyện..."
