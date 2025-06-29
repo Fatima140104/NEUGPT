@@ -16,7 +16,7 @@ const openai = new OpenAI({ apiKey: config.openaiApiKey });
 const generateSessionTitle = async (message: string): Promise<string> => {
   try {
     const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: getDefaultModel().id,
       messages: [
         {
           role: "system",
