@@ -316,6 +316,7 @@ body,
 .markdown ul {
   list-style-position: outside;
   /* margin-top: 1em; */
+  width: 100%;
   margin-bottom: 1em;
   padding-left: 2em;
 }
@@ -323,6 +324,7 @@ body,
 .prose li,
 .markdown li {
   text-align: -webkit-match-parent;
+  width: 100%;
   margin-bottom: 0.5em;
   margin-top: 0.5em;
 }
@@ -1067,3 +1069,10 @@ body,
 }
 
 /* Test */
+.overflow-visible {
+  overflow: visible;
+}
+
+.overflow-visible\! {
+  overflow: visible !important;
+}
