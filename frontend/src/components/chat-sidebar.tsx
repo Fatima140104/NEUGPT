@@ -150,7 +150,7 @@ function ChatSidebar() {
           Cuộc trò chuyện mới
         </Button>
       </SidebarHeader>
-      <SidebarContent className="p-2">
+      <SidebarContent className="pt-0 pb-2 px-2">
         <SidebarGroup className="sticky top-0 z-10 bg-sidebar">
           <SidebarGroupContent>
             <div className="relative">

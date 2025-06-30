@@ -141,7 +141,7 @@ export const MessageView: React.FC = () => {
       ref={scrollableRef}
     >
       <div className="space-y-4 pt-5 pb-20 px-4">
-        {isAwaitingFirstChunk && (
+        {/* {isAwaitingFirstChunk && (
           <div className="max-w-3xl mx-auto w-full flex justify-start translate-x-[-20px]">
             <div className="relative max-w-[70%] rounded-3xl px-5 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100">
               <video
@@ -154,7 +154,7 @@ export const MessageView: React.FC = () => {
               />
             </div>
           </div>
-        )}
+        )} */}
         {messages.map((message, idx) => (
           <div
             key={(message as any)._id || message.id}

@@ -9,6 +9,7 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useChatSession } from "@/providers/ChatSessionContext";
 import Header from "./Header";
 import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { useNavigate } from "react-router-dom";
 
 interface ChatViewProps {
   sessionId: string | undefined;
@@ -21,6 +22,7 @@ export const ChatView: React.FC<ChatViewProps> = ({ sessionId }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const authFetch = useAuthFetch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!sessionId || sessionId === "new") {
@@ -34,6 +36,9 @@ export const ChatView: React.FC<ChatViewProps> = ({ sessionId }) => {
         dispatch({ type: "SET_MESSAGES", payload: res.data });
       })
       .catch((err) => {
+        if (err.response?.status === 403) {
+          navigate("/");
+        }
         if (err.response?.status !== 401) {
           setError(err.message || "Failed to fetch messages");
         }
