@@ -8,6 +8,7 @@ import { useStreamChat } from "@/hooks/useStreamChat";
 
 export const ChatForm: React.FC = () => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const {
     message,
     setMessage,
@@ -21,13 +22,32 @@ export const ChatForm: React.FC = () => {
     availableModels,
   } = useStreamChat();
 
+  // File picker handler
+  const handleFileButtonClick = () => {
+    fileInputRef.current?.click();
+  };
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      // TODO: handle the selected file(s)
+      console.log("Selected file:", files[0]);
+    }
+  };
+
   return (
     <form
       onSubmit={handleSubmit}
       className="w-full flex flex-col items-center pr-4 pb-4 pt-2"
       autoComplete="off"
     >
-      <div className="shadow-lg flex w-full max-w-3xl flex-col mx-auto items-center justify-center overflow-clip rounded-[28px] bg-background dark:bg-[#303030]">
+      {/* Hidden file input */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        style={{ display: "none" }}
+        onChange={handleFileChange}
+      />
+      <div className="shadow-md border-2 border-gray-200 flex w-full max-w-3xl flex-col mx-auto items-center justify-center overflow-clip rounded-[28px] bg-background dark:bg-[#303030]">
         <div className="relative flex w-full items-end px-2.5 py-2.5">
           <div className="flex w-full flex-col">
             <div className="flex min-h-12 items-start">
@@ -64,6 +84,7 @@ export const ChatForm: React.FC = () => {
               size="icon"
               variant="ghost"
               className="rounded-full"
+              onClick={handleFileButtonClick}
             >
               <Paperclip className="h-5 w-5" />
             </Button>
