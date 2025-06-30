@@ -12,7 +12,7 @@ import {
   Share,
   MoreVertical,
 } from "lucide-react";
-import logoNeu from "../assets/favicon.png";
+import logoNeu from "@/assets/favicon.png";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -36,7 +36,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useChatSession } from "../providers/ChatSessionContext";
+import { useChatSession } from "@/providers/ChatSessionContext";
 import { useNavigate } from "react-router-dom";
 import { getUserFromToken, removeToken } from "@/lib/auth";
 
