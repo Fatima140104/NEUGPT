@@ -14,7 +14,10 @@ const CodeBar: React.FC<
   Omit<CodeBarProps, "codeRef"> & {
     codeRef: React.RefObject<HTMLElement | null>;
   }
-> = React.memo(({ lang, error, codeRef }) => {
+> = React.memo(({ 
+  lang, 
+  // error, 
+  codeRef }) => {
   const [isCopied, setIsCopied] = useState(false);
   return (
     <div className="relative flex items-center justify-between bg-code-block-background px-4 py-1.5 pt-4 font-sans text-xs text-gray-200">
