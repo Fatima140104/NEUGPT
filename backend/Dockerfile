@@ -7,21 +7,18 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --only=production
+# Install ALL dependencies (including devDependencies)
+RUN npm ci
 
 # Copy TypeScript config and source code
 COPY tsconfig.json ./
 COPY src ./src
 
-# Install dev dependencies for building
-RUN npm ci
-
 # Build the application
 RUN npm run build
 
-# # Remove dev dependencies to reduce image size
-# RUN npm ci --only=production && npm cache clean --force
+# Remove devDependencies to reduce image size
+RUN npm ci --only=production && npm cache clean --force
 
 # Expose port
 EXPOSE 3000
