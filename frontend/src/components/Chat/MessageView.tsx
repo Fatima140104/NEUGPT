@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { useChat } from "../../providers/ChatContext";
+import { useChat } from "@/providers/ChatContext";
 import useMessageScrolling from "@/hooks/useMessageScrolling";
-import type { Message } from "../../providers/ChatContext";
-import Markdown from "../Messages/Markdown";
-import Container from "../Messages/Container";
-import ScrollToBottom from "../Messages/ScrollToBottom";
+import type { Message } from "@/providers/ChatContext";
+import Markdown from "@/components/Messages/Markdown";
+import Container from "@/components/Messages/Container";
+import ScrollToBottom from "@/components/Messages/ScrollToBottom";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import waitingResponseAnimation from "@/assets/loading-message-animation.webm";
 import HoverButtons from "./HoverButtons";
-import type { HoverButtonConfig } from "../../common/types";
+import type { HoverButtonConfig } from "@/common/types";
 import { Check, Copy } from "lucide-react";
 
 function useCopyToClipboard() {

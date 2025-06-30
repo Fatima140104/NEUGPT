@@ -1,4 +1,4 @@
-import { getToken } from "../lib/auth";
+import { getToken } from "@/lib/auth";
 
 export async function streamChat({
   url,

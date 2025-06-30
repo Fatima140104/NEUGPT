@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { MessageView } from "./MessageView";
 import { ChatForm } from "./ChatForm";
-import { useChat } from "../../providers/ChatContext";
+import { useChat } from "@/providers/ChatContext";
 import { useAuthFetch } from "@/hooks/useAuthFetch";
 import { cn } from "@/lib/utils";
 import { Landing } from "./Landing";
-import { LoadingSpinner } from "../ui/loading-spinner";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useChatSession } from "@/providers/ChatSessionContext";
 import Header from "./Header";
-import { DropdownMenuSeparator } from "../ui/dropdown-menu";
+import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 
 interface ChatViewProps {
   sessionId: string | undefined;

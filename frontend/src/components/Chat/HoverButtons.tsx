@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import type { HoverButtonConfig, HoverButtonType } from "../../common/types";
+import type { HoverButtonConfig, HoverButtonType } from "@/common/types";
 import {
   Copy,
   ThumbsUp,
