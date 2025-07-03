@@ -85,6 +85,7 @@ interface ChatSessionContextType {
   selectSession: (id: string) => void;
   addSession: (title?: string) => Promise<any>;
   updateSession: (session: ChatSession) => void;
+  updateSessionTitle: (id: string, title: string) => Promise<void>;
   deleteSession: (id: string) => void;
   refreshSession: (id: string) => void;
 }
@@ -218,6 +219,33 @@ export const ChatSessionProvider: React.FC<{ children: ReactNode }> = ({
     [authFetch]
   );
 
+  // Thêm function mới để update session title
+  const updateSessionTitle = useCallback(
+    async (id: string, title: string) => {
+      try {
+        const res = await authFetch(`/sessions/${id}/title`, {
+          method: "PUT",
+          data: { title: title.trim() },
+        });
+        if (res === null) return;
+        if (res.status !== 200) throw new Error("Failed to update session title");
+        const updatedSession = await res.data;
+        dispatch({ 
+          type: "UPDATE_SESSION", 
+          payload: {
+            _id: updatedSession._id || updatedSession.id,
+            title: updatedSession.title,
+            timestamp: new Date(updatedSession.createdAt || updatedSession.timestamp),
+          }
+        });
+      } catch (err) {
+        console.error(err);
+        throw err;
+      }
+    },
+    [authFetch]
+  );
+
   // fetch sessions on mount
   useEffect(() => {
     if (getToken()) {
@@ -237,6 +265,7 @@ export const ChatSessionProvider: React.FC<{ children: ReactNode }> = ({
         selectSession,
         addSession,
         updateSession,
+        updateSessionTitle,
         deleteSession,
         refreshSession,
       }}
