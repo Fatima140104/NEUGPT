@@ -1,33 +1,30 @@
-version: '3.8'
-
 services:
-  # Backend service
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: neugpt-backend
     ports:
-      - "3000:3000"
+      - "222:3000"
     env_file:
       - ./backend/.env
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
+    # volumes: for local development
+    #   - ./backend:/app
     networks:
       - neugpt-network
     restart: unless-stopped
 
-  # Frontend service  
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: neugpt-frontend
     ports:
-      - "80:80"
+      - "8000:80"
     depends_on:
       - backend
+    # volumes: for local development
+    #   - ./frontend:/usr/share/nginx/html
     networks:
       - neugpt-network
     restart: unless-stopped
