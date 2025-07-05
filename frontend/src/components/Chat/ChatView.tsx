@@ -40,6 +40,7 @@ export const ChatView: React.FC<ChatViewProps> = ({ sessionId }) => {
           navigate("/");
         }
         if (err.response?.status !== 401) {
+          navigate("/");
           setError(err.message || "Failed to fetch messages");
         }
       })
