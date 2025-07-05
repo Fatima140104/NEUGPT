@@ -1,9 +1,9 @@
 import { useRef, useEffect, useState, useCallback } from "react";
-import useScrollToRef from "./useScrollToRef";
+import useScrollToRef from "@/hooks/useScrollToRef";
 import { useChat } from "@/providers/ChatContext";
 
 const debounceRate = 150;
-const threshold = 0.85;
+// const threshold = 0.85;
 
 export default function useMessageScrolling(
   messagesTree: any[],

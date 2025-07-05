@@ -9,6 +9,8 @@ import {
   getDefaultModel,
   getAvailableModels,
 } from "../config/models";
+import File from "../models/file";
+import { Types } from "mongoose";
 
 const openai = new OpenAI({ apiKey: config.openaiApiKey });
 
@@ -46,6 +48,7 @@ const generateSessionTitle = async (message: string): Promise<string> => {
 
     return title.trim();
   } catch (error) {
+    //
     console.error("Error generating session title:", error);
     // Fallback: sử dụng 30 ký tự đầu của message
     return message.length > 30 ? message.substring(0, 30) + "..." : message;
@@ -69,8 +72,7 @@ const updateSessionTitleAsync = async (
 export const chatWithAI = async (req: Request, res: Response) => {
   //Extract and validate request data
   const userId = (req as any).user?.id;
-  const sessionId = req.body.sessionId || "";
-  const { message, model: requestedModel } = req.body;
+  const { sessionId, message, model: requestedModel, file_ids } = req.body;
 
   // Validate required fields
   if (!sessionId) {
@@ -122,12 +124,14 @@ export const chatWithAI = async (req: Request, res: Response) => {
     const existingChats = await Chat.find({ session: sessionId });
     const isFirstMessage = existingChats.length === 0;
 
+    // Save the user message
     await Chat.create({
       session: sessionId,
       user: userId,
       role: "user",
       content: message,
       timestamp: new Date(),
+      files: file_ids,
     });
 
     if (isFirstMessage) {
@@ -139,8 +143,6 @@ export const chatWithAI = async (req: Request, res: Response) => {
     // Retrieve chat history for context
     const chatHistory = await Chat.find({ session: sessionId })
       .sort({ timestamp: 1 })
-      // No need for limit, use cached context api model
-      // .limit(10)
       .select("role content");
 
     // Prepare messages for OpenAI API
@@ -154,6 +156,7 @@ export const chatWithAI = async (req: Request, res: Response) => {
     });
 
     // Call OpenAI API and stream response to client
+    // TODO: Add toast to show error message (rate limit, etc)
     let fullContent = "";
     const completion = await openai.chat.completions.create(
       {
@@ -171,6 +174,7 @@ export const chatWithAI = async (req: Request, res: Response) => {
         res.write(`data: ${JSON.stringify(content)}\n\n`);
       }
     }
+
     // Store assistant message after streaming is done
     await Chat.create({
       session: sessionId,
@@ -178,7 +182,9 @@ export const chatWithAI = async (req: Request, res: Response) => {
       role: "assistant",
       content: fullContent,
       timestamp: new Date(),
+      files: file_ids || [],
     });
+
     res.write("event: end\ndata: [DONE]\n\n");
     res.end();
   } catch (err: any) {

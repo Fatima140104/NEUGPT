@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import Home from "@/pages/Home";
 import Login from "@/pages/Login";
-import ProtectedRoute from "./ProtectedRoute";
+import ProtectedRoute from "@/routes/ProtectedRoute";
 
 const AppRoutes = () => {
   return (
@@ -17,4 +17,4 @@ const AppRoutes = () => {
   );
 };
 
-export default AppRoutes; 
+export default AppRoutes;

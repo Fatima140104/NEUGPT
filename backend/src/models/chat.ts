@@ -5,6 +5,7 @@ export interface IChat extends Document {
   user: Types.ObjectId;
   role: "user" | "assistant" | "system";
   content: string;
+  files: Types.ObjectId[];
   timestamp: Date;
 }
 
@@ -13,6 +14,7 @@ const chatSchema = new Schema<IChat>({
   user: { type: Schema.Types.ObjectId, ref: "User", required: true },
   role: { type: String, enum: ["user", "assistant", "system"], required: true },
   content: { type: String, required: true },
+  files: { type: [Schema.Types.ObjectId], ref: "File", required: false },
   timestamp: { type: Date, required: true },
 });
 

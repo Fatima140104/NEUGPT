@@ -1,12 +1,6 @@
 import React, { createContext, useContext, useReducer } from "react";
 import type { ReactNode } from "react";
-
-export interface Message {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  timestamp: Date;
-}
+import type { Message } from "@/providers/MessageContext";
 
 interface ChatState {
   messageTree: Message[];
@@ -15,7 +9,6 @@ interface ChatState {
   isSubmitting: boolean;
   isLoading: boolean;
   selectedChat?: string | null;
-  isAwaitingFirstChunk?: boolean;
 }
 
 type ChatAction =
@@ -24,8 +17,7 @@ type ChatAction =
   | { type: "CLEAR_MESSAGES" }
   | { type: "SET_MESSAGES"; payload: Message[] }
   | { type: "SET_ABORT_SCROLL"; payload: boolean }
-  | { type: "SET_IS_SUBMITTING"; payload: boolean }
-  | { type: "SET_AWAITING_FIRST_CHUNK"; payload: boolean };
+  | { type: "SET_IS_SUBMITTING"; payload: boolean };
 
 const initialState: ChatState = {
   messageTree: [],
@@ -34,7 +26,6 @@ const initialState: ChatState = {
   isSubmitting: false,
   isLoading: false,
   selectedChat: null,
-  isAwaitingFirstChunk: false,
 };
 
 const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
@@ -69,11 +60,6 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         ...state,
         isSubmitting: action.payload,
       };
-    case "SET_AWAITING_FIRST_CHUNK":
-      return {
-        ...state,
-        isAwaitingFirstChunk: action.payload,
-      };
     default:
       return state;
   }
@@ -92,7 +78,12 @@ export const ChatProvider: React.FC<{ children: ReactNode }> = ({
   const [state, dispatch] = useReducer(chatReducer, initialState);
 
   return (
-    <ChatContext.Provider value={{ state, dispatch }}>
+    <ChatContext.Provider
+      value={{
+        state,
+        dispatch,
+      }}
+    >
       {children}
     </ChatContext.Provider>
   );

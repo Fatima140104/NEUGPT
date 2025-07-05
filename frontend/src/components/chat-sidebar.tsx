@@ -229,6 +229,7 @@ function ChatSidebar() {
                               <DropdownMenuItem
                                 onClick={() => {
                                   deleteSession(session._id);
+                                  navigate("/");
                                 }}
                               >
                                 <Trash2 className="h-5 w-5 mr-2 text-red-500" />{" "}

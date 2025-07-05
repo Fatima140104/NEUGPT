@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getToken, removeToken } from "./auth";
+import { getToken, removeToken } from "@/lib/auth";
 
 const api = axios.create({
   baseURL: "/api",

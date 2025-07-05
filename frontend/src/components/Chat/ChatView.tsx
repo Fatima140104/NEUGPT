@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { MessageView } from "./MessageView";
-import { ChatForm } from "./ChatForm";
+import { MessageView } from "@/components/Chat/MessageView";
+import { ChatForm } from "@/components/Chat/ChatForm";
 import { useChat } from "@/providers/ChatContext";
 import { useAuthFetch } from "@/hooks/useAuthFetch";
 import { cn } from "@/lib/utils";
-import { Landing } from "./Landing";
+import { Landing } from "@/components/Chat/Landing";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useChatSession } from "@/providers/ChatSessionContext";
-import Header from "./Header";
+import Header from "@/components/Chat/Header";
 import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
 

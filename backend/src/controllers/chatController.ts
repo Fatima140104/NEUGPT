@@ -20,7 +20,10 @@ export const getChats = async (
   next: NextFunction
 ) => {
   try {
-    const chats = await Chat.find().populate("session").populate("user");
+    const chats = await Chat.find()
+      .populate("session")
+      .populate("user")
+      .populate("files");
     res.json(chats);
   } catch (err) {
     next(err);
@@ -35,7 +38,8 @@ export const getChatById = async (
   try {
     const chat = await Chat.findById(req.params.id)
       .populate("session")
-      .populate("user");
+      .populate("user")
+      .populate("files");
     if (!chat) return res.status(404).json({ message: "Chat not found" });
     res.json(chat);
   } catch (err) {
@@ -52,7 +56,8 @@ export const getChatsBySession = async (
     const { sessionId } = req.params;
     const chats = await Chat.find({ session: sessionId })
       .sort({ timestamp: 1 })
-      .populate("user");
+      .populate("user")
+      .populate("files");
     res.json(chats);
   } catch (err) {
     next(err);
