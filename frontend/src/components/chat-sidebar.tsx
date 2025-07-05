@@ -9,7 +9,7 @@ import {
   Edit3,
   Trash2,
   Archive,
-  Share,
+  // Share,
   MoreVertical,
 } from "lucide-react";
 import logoNeu from "@/assets/favicon.png";
@@ -39,6 +39,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useChatSession } from "@/providers/ChatSessionContext";
 import { useNavigate } from "react-router-dom";
 import { getUserFromToken, removeToken } from "@/lib/auth";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 function SessionTitleWithTyping({
   title,
@@ -87,7 +96,8 @@ function SessionTitleWithTyping({
 
 function ChatSidebar() {
   const navigate = useNavigate();
-  const { state, selectSession, deleteSession } = useChatSession();
+  const { state, selectSession, deleteSession, updateSessionTitle } =
+    useChatSession();
   const [searchQuery, setSearchQuery] = React.useState("");
   const [hoveredSessionId, setHoveredSessionId] = React.useState<string | null>(
     null
@@ -98,6 +108,13 @@ function ChatSidebar() {
   const [updatedSessionId, setUpdatedSessionId] = React.useState<string | null>(
     null
   );
+
+  const [renameDialogOpen, setRenameDialogOpen] = React.useState(false);
+  const [renameSessionId, setRenameSessionId] = React.useState<string | null>(
+    null
+  );
+  const [newTitle, setNewTitle] = React.useState("");
+  const [isUpdating, setIsUpdating] = React.useState(false);
 
   const user = getUserFromToken();
 
@@ -110,7 +127,6 @@ function ChatSidebar() {
       session.title?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-  // Animate session title when updated
   React.useEffect(() => {
     if (state.lastUpdatedSessionId) {
       setUpdatedSessionId(state.lastUpdatedSessionId);
@@ -127,6 +143,36 @@ function ChatSidebar() {
   const handleSelectSession = (id: string) => {
     selectSession(id);
     navigate(`/c/${id}`);
+  };
+
+  const handleRenameSession = async () => {
+    if (!renameSessionId || !newTitle.trim() || isUpdating) return;
+
+    setIsUpdating(true);
+    try {
+      await updateSessionTitle(renameSessionId, newTitle.trim());
+      setRenameDialogOpen(false);
+      setRenameSessionId(null);
+      setNewTitle("");
+      setMenuOpenSessionId(null);
+    } catch (error) {
+      console.error("Failed to update session title:", error);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleOpenRenameDialog = (sessionId: string, currentTitle: string) => {
+    setRenameSessionId(sessionId);
+    setNewTitle(currentTitle);
+    setRenameDialogOpen(true);
+  };
+
+  const handleDelete = async (sessionId: string) => {
+    if (sessionId) {
+      await deleteSession(sessionId);
+      navigate("/");
+    }
   };
 
   return (
@@ -219,18 +265,79 @@ function ChatSidebar() {
                               </span>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="start">
-                              <DropdownMenuItem>
-                                <Edit3 className="h-5 w-5 mr-2" /> Đổi tên
-                              </DropdownMenuItem>
+                              <Dialog
+                                open={renameDialogOpen}
+                                onOpenChange={setRenameDialogOpen}
+                              >
+                                <DialogTrigger asChild>
+                                  <DropdownMenuItem
+                                    onSelect={(e) => {
+                                      e.preventDefault();
+                                      handleOpenRenameDialog(
+                                        session._id,
+                                        session.title || ""
+                                      );
+                                    }}
+                                  >
+                                    <Edit3 className="h-5 w-5 mr-2" /> Đổi tên
+                                  </DropdownMenuItem>
+                                </DialogTrigger>
+
+                                <DialogContent className="sm:max-w-[425px]">
+                                  <DialogHeader>
+                                    <DialogTitle>
+                                      Đổi tên cuộc trò chuyện
+                                    </DialogTitle>
+                                    <DialogDescription>
+                                      Nhập tên mới cho cuộc trò chuyện này.
+                                    </DialogDescription>
+                                  </DialogHeader>
+
+                                  <div className="grid gap-4 py-4">
+                                    <Input
+                                      value={newTitle}
+                                      onChange={(e) =>
+                                        setNewTitle(e.target.value)
+                                      }
+                                      placeholder="Tên cuộc trò chuyện..."
+                                      onKeyDown={(e) => {
+                                        if (e.key === "Enter" && !e.shiftKey) {
+                                          e.preventDefault();
+                                          handleRenameSession();
+                                        }
+                                        if (e.key === "Escape") {
+                                          setRenameDialogOpen(false);
+                                        }
+                                      }}
+                                      disabled={isUpdating}
+                                      autoFocus
+                                    />
+                                  </div>
+
+                                  <DialogFooter>
+                                    <Button
+                                      variant="outline"
+                                      onClick={() => setRenameDialogOpen(false)}
+                                      disabled={isUpdating}
+                                    >
+                                      Hủy
+                                    </Button>
+                                    <Button
+                                      onClick={handleRenameSession}
+                                      disabled={!newTitle.trim() || isUpdating}
+                                    >
+                                      {isUpdating ? "Đang lưu..." : "Lưu"}
+                                    </Button>
+                                  </DialogFooter>
+                                </DialogContent>
+                              </Dialog>
+
                               <DropdownMenuSeparator />
                               <DropdownMenuItem>
                                 <Archive className="h-5 w-5 mr-2" /> Lưu trữ
                               </DropdownMenuItem>
                               <DropdownMenuItem
-                                onClick={() => {
-                                  deleteSession(session._id);
-                                  navigate("/");
-                                }}
+                                onClick={() => handleDelete(session._id)}
                               >
                                 <Trash2 className="h-5 w-5 mr-2 text-red-500" />{" "}
                                 Xóa
@@ -238,10 +345,6 @@ function ChatSidebar() {
                             </DropdownMenuContent>
                           </DropdownMenu>
                         )}
-                        {/* TODO: Thêm ngày tạo */}
-                        {/* {<span className="text-xs text-muted-foreground ml-2">
-                          {new Date(session.timestamp).toLocaleString()}
-                        </span>} */}
                       </div>
                     </button>
                   </SidebarMenuButton>

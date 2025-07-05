@@ -7,7 +7,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { Share2, Archive, Trash2, MoreVertical } from "lucide-react";
+import { Trash2, MoreVertical } from "lucide-react";
 import { useChatSession } from "@/providers/ChatSessionContext";
 import { useNavigate } from "react-router-dom";
 
@@ -17,8 +17,12 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ selectedTitle, sessionId }) => {
-  const { deleteSession, updateSession, state } = useChatSession();
-  const session = sessionId && state.sessions.find((s) => s._id === sessionId);
+  const { 
+    deleteSession,
+    // updateSession, 
+    // state 
+  } = useChatSession();
+  // const session = sessionId && state.sessions.find((s) => s._id === sessionId);
   const navigate = useNavigate();
 
   // const handleArchive = async () => {

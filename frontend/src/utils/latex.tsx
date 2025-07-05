@@ -1,12 +1,12 @@
 // Pre-compile all regular expressions for better performance
-const MHCHEM_CE_REGEX = /\$\\ce\{/g;
-const MHCHEM_PU_REGEX = /\$\\pu\{/g;
-const MHCHEM_CE_ESCAPED_REGEX = /\$\\\\ce\{[^}]*\}\$/g;
-const MHCHEM_PU_ESCAPED_REGEX = /\$\\\\pu\{[^}]*\}\$/g;
-const CURRENCY_REGEX =
-  /(?<![\\$])\$(?!\$)(?=\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?(?:\s|$|[^a-zA-Z\d]))/g;
-const SINGLE_DOLLAR_REGEX =
-  /(?<!\\)\$(?!\$)((?:[^$\n]|\\[$])+?)(?<!\\)\$(?!\$)/g;
+// const MHCHEM_CE_REGEX = /\$\\ce\{/g;
+// const MHCHEM_PU_REGEX = /\$\\pu\{/g;
+// const MHCHEM_CE_ESCAPED_REGEX = /\$\\\\ce\{[^}]*\}\$/g;
+// const MHCHEM_PU_ESCAPED_REGEX = /\$\\\\pu\{[^}]*\}\$/g;
+// const CURRENCY_REGEX =
+//   /(?<![\\$])\$(?!\$)(?=\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?(?:\s|$|[^a-zA-Z\d]))/g;
+// const SINGLE_DOLLAR_REGEX =
+//   /(?<!\\)\$(?!\$)((?:[^$\n]|\\[$])+?)(?<!\\)\$(?!\$)/g;
 
 /**
  * Escapes mhchem package notation in LaTeX by converting single dollar delimiters to double dollars
@@ -15,17 +15,17 @@ const SINGLE_DOLLAR_REGEX =
  * @param text - The input text containing potential mhchem notation
  * @returns The processed text with properly escaped mhchem notation
  */
-function escapeMhchem(text: string): string {
-  // First escape the backslashes in mhchem commands
-  let result = text.replace(MHCHEM_CE_REGEX, "$\\\\ce{");
-  result = result.replace(MHCHEM_PU_REGEX, "$\\\\pu{");
+// function escapeMhchem(text: string): string {
+//   // First escape the backslashes in mhchem commands
+//   let result = text.replace(MHCHEM_CE_REGEX, "$\\\\ce{");
+//   result = result.replace(MHCHEM_PU_REGEX, "$\\\\pu{");
 
-  // Then convert single dollar mhchem to double dollar
-  result = result.replace(MHCHEM_CE_ESCAPED_REGEX, (match) => `$${match}$`);
-  result = result.replace(MHCHEM_PU_ESCAPED_REGEX, (match) => `$${match}$`);
+//   // Then convert single dollar mhchem to double dollar
+//   result = result.replace(MHCHEM_CE_ESCAPED_REGEX, (match) => `$${match}$`);
+//   result = result.replace(MHCHEM_PU_ESCAPED_REGEX, (match) => `$${match}$`);
 
-  return result;
-}
+//   return result;
+// }
 
 /**
  * Efficiently finds all code block regions in the content
