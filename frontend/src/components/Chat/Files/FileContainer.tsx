@@ -38,9 +38,9 @@ const FileContainer = ({
         )}
       >
         <div className="w-56 p-1.5">
-          <div className="flex flex-row items-center gap-2">
+          <div className="flex flex-row items-start gap-2">
             <FilePreview file={file} fileType={fileType} className="relative" />
-            <div className="overflow-hidden">
+            <div className="overflow-hidden flex flex-col items-start">
               <div className="truncate font-medium" title={file.filename}>
                 {file.filename}
               </div>

@@ -182,7 +182,6 @@ export const validateFiles = ({
     }
 
     if (!checkType(originalFile.type, supportedMimeTypes)) {
-      console.log(originalFile);
       setError("Currently, unsupported file type: " + originalFile.type);
       return false;
     }

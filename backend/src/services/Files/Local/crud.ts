@@ -173,26 +173,57 @@ async function saveFileFromURL({
 }
 
 /**
- * Constructs a local file path for a given file name and base path. This function simply joins the base
- * path and the file name to create a file path. It does not check for the existence of the file at the path.
+ * Deletes a file from the filesystem by its relative path.
  *
- * @param {Object} params - The parameters object.
- * @param {string} params.fileName - The name of the file for which the path is to be constructed. This should
- *                                   include the file extension.
- * @param {string} [params.basePath='images'] - Optional. The base directory to be used for constructing the file path.
- *                                              Defaults to 'images' if not specified.
- *
- * @returns {string}
- *          The constructed local file path.
+ * @param {string} id - The relative file path (e.g., "/uploads/userid/filename.ext" or "/images/userid/filename.ext").
+ * @param {Request} [req] - (Optional) The Express request object for path validation.
+ * @returns {Promise<void>}
  */
-async function getLocalFileURL({
-  fileName,
-  basePath = "images",
-}: {
-  fileName: string;
-  basePath?: string;
-}) {
-  return path.posix.join("/", basePath, fileName);
+const deleteLocalFile = async (id: string, req?: Request) => {
+  try {
+    // Determine base directory
+    let baseDir: string;
+    let absPath: string;
+
+    if (id.startsWith("/uploads/")) {
+      baseDir = req?.app?.locals?.paths?.uploads || paths.uploads;
+      absPath = path.join(baseDir, id.replace("/uploads/", ""));
+    } else if (id.startsWith("/images/")) {
+      baseDir = req?.app?.locals?.paths?.imageOutput || paths.publicPath;
+      absPath = path.join(baseDir, id.replace("/images/", ""));
+    } else {
+      // fallback: treat as relative to uploads
+      baseDir = req?.app?.locals?.paths?.uploads || paths.uploads;
+      absPath = path.join(baseDir, id);
+    }
+
+    // Security: ensure absPath is within baseDir
+    const rel = path.relative(baseDir, absPath);
+    if (
+      rel.startsWith("..") ||
+      path.isAbsolute(rel) ||
+      rel.includes(`..${path.sep}`)
+    ) {
+      throw new Error(`Invalid file path: ${id}`);
+    }
+
+    await unlinkFile(absPath);
+  } catch (error) {
+    console.error("Error deleting file:", error);
+    throw error;
+  }
+};
+
+/**
+ * Returns a public URL for a local file.
+ *
+ * @param {string} id - The relative file path (e.g., "/uploads/userid/filename.ext" or "/images/userid/filename.ext").
+ * @param {string} [format] - (Optional) File format/extension (not used for local).
+ * @returns {string} - The public URL path.
+ */
+function getLocalFileURL(id: string, format?: string) {
+  // For local, just return the id as the public URL path
+  return id;
 }
 
 /**
@@ -247,7 +278,13 @@ const unlinkFile = async (filepath: string) => {
  *          A promise that resolves when the file has been successfully deleted, or throws an error if the
  *          file path is invalid or if there is an error in deletion.
  */
-const deleteLocalFile = async (req: Request, file: Express.Multer.File) => {
+const deleteLocalFileOld = async ({
+  req,
+  file,
+}: {
+  req: Request;
+  file: Express.Multer.File;
+}) => {
   const { publicPath, uploads } = req.app.locals.paths;
 
   /** Filepath stripped of query parameters (e.g., ?manual=true) */
@@ -339,7 +376,6 @@ async function uploadLocalFile({
   );
 
   await unlinkFile(inputFilePath);
-  console.log("filepath", filepath);
   return { filepath, bytes, dimensions };
 }
 

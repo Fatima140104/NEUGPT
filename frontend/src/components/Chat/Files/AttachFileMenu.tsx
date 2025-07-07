@@ -50,7 +50,8 @@ const AttachFileMenu = ({
         label: "Upload Image",
         onClick: () => {
           setToolResource(undefined);
-          handleUploadClick(true);
+          // Accept most common file type
+          handleUploadClick();
         },
         icon: <ImageUpIcon className="icon-md" />,
       },

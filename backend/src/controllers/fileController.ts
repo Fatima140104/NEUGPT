@@ -210,9 +210,8 @@ async function batchUpdateFiles(updates: IMongoFile[]) {
 const deleteFileHandler = async (req: Request, res: Response) => {
   try {
     const { files } = req.body;
-    const userId = (req as any).user?.id;
-    if (!files || !userId) {
-      return res.status(400).json({ error: "Missing files or userId" });
+    if (!files) {
+      return res.status(400).json({ error: "Missing files" });
     }
     const deletedIds = await processDeleteRequest({ req, files });
     res.status(200).json({ success: true, result: { deleted: deletedIds } });

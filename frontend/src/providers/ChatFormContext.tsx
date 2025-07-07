@@ -54,6 +54,7 @@ interface ChatFormContextType {
   state: ChatFormState;
   dispatch: React.Dispatch<ChatFormAction>;
   files: Map<string, ExtendedFile>;
+  filesLoading?: boolean;
   setFiles: React.Dispatch<React.SetStateAction<Map<string, ExtendedFile>>>;
   removeFile: (file_id: string) => void;
   setFilesLoading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -94,6 +95,7 @@ export const ChatFormProvider: React.FC<{ children: ReactNode }> = ({
         state,
         dispatch,
         files: state.files || new Map(),
+        filesLoading: state.filesLoading,
         setFiles,
         setFilesLoading,
         removeFile,

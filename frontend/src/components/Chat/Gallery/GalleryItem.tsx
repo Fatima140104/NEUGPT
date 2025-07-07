@@ -17,12 +17,15 @@ const FileGalleryItem: React.FC<FileGalleryItemProps> = ({ file }) => {
     );
   }
   if (file.type?.startsWith("image")) {
+    const source = file.source || "local";
+    let url = file.filepath || "";
     // Path to the file on the server
     // (file.filepath: 'uploads/<userid>/<file_name>.ext')
-    const url = file.filepath?.startsWith("/api/uploads")
-      ? file.filepath.replace("/api/uploads", "")
-      : `/api${file.filepath}`;
-
+    if (source === "local") {
+      url = file.filepath?.startsWith("/api/uploads")
+        ? file.filepath.replace("/api/uploads", "")
+        : `/api${file.filepath}`;
+    }
     return (
       <div className="relative w-full h-full">
         {/* Skeleton Loader */}

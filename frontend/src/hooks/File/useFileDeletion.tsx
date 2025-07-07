@@ -85,9 +85,10 @@ const useFileDeletion = ({
         file_id,
         temp_file_id = "",
         filepath = "",
-        source = FileSources.local,
+        source = FileSources.cloudinary,
         embedded,
         attached = false,
+        type,
       } = _file as TFile & { attached?: boolean };
 
       const progress = (_file as ExtendedFile)?.progress ?? 1;
@@ -100,6 +101,7 @@ const useFileDeletion = ({
         embedded,
         filepath,
         source,
+        type,
       };
 
       if (setFiles) {
@@ -129,60 +131,7 @@ const useFileDeletion = ({
     [debouncedDelete, setFilesToDelete, tool_resource]
   );
 
-  const deleteFiles = useCallback(
-    ({
-      files,
-      setFiles,
-    }: {
-      files: ExtendedFile[] | TFile[];
-      setFiles?: FileMapSetter;
-    }) => {
-      const batchFiles: BatchFile[] = [];
-      for (const _file of files) {
-        const {
-          file_id,
-          embedded,
-          temp_file_id,
-          filepath = "",
-          source = FileSources.local,
-        } = _file;
-
-        batchFiles.push({
-          source,
-          file_id,
-          filepath,
-          temp_file_id,
-          embedded: embedded ?? false,
-        });
-      }
-
-      if (setFiles) {
-        setFiles((currentFiles) => {
-          const updatedFiles = new Map(currentFiles);
-          batchFiles.forEach((file) => {
-            updatedFiles.delete(file.file_id);
-            if (file.temp_file_id) {
-              updatedFiles.delete(file.temp_file_id);
-            }
-          });
-          const filesToUpdate = Object.fromEntries(updatedFiles);
-          setFilesToDelete(filesToUpdate);
-          return updatedFiles;
-        });
-      }
-
-      setFileDeleteBatch((prevBatch) => {
-        const newBatch = [...prevBatch, ...batchFiles];
-        debouncedDelete({
-          filesToDelete: newBatch,
-        });
-        return newBatch;
-      });
-    },
-    [debouncedDelete, setFilesToDelete]
-  );
-
-  return { deleteFile, deleteFiles };
+  return { deleteFile };
 };
 
 export default useFileDeletion;

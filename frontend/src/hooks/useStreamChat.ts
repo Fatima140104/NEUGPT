@@ -12,7 +12,7 @@ export function useStreamChat() {
   const [selectedModel, setSelectedModel] = useState<AIModel | null>(null);
   const [error, setError] = useState<string | null>(null);
   const { state, dispatch } = useChat();
-  const { files, setFiles } = useChatForm();
+  const { state: formState, files, setFiles } = useChatForm();
   const {
     state: sessionState,
     addSession,
@@ -31,7 +31,7 @@ export function useStreamChat() {
 
   const handleSubmit = async (e: React.FormEvent | React.KeyboardEvent) => {
     e.preventDefault();
-    if (!message.trim() || state.isLoading) return;
+    if (!message.trim() || state.isLoading || formState.filesLoading) return;
 
     let currentSessionId = sessionState.selectedSessionId;
     let isNewSession = false;

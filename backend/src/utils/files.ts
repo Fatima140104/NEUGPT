@@ -50,7 +50,6 @@ const getBufferMetadata = async (buffer: Buffer) => {
     };
   }
 
-  console.log("extension", extension);
   return {
     bytes,
     type:

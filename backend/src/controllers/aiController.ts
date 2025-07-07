@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import Chat from "../models/chat";
 import Session from "../models/session";
 import { OpenAI } from "openai";
-import config from "../config/config";
+import dotenv from "../config/config";
 import {
   isModelValid,
   getModelById,
@@ -12,7 +12,7 @@ import {
 import File from "../models/file";
 import { Types } from "mongoose";
 
-const openai = new OpenAI({ apiKey: config.openaiApiKey });
+const openai = new OpenAI({ apiKey: dotenv.openaiApiKey });
 
 // Function để generate title từ AI
 const generateSessionTitle = async (message: string): Promise<string> => {
@@ -149,9 +149,12 @@ export const chatWithAI = async (req: Request, res: Response) => {
     const messages: any[] = [];
     // Add chat history to messages
     chatHistory.forEach((chat) => {
+      
+      const content = chat.content;
+
       messages.push({
         role: chat.role,
-        content: chat.content,
+        content: content,
       });
     });
 

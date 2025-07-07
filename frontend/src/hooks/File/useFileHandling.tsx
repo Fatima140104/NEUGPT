@@ -8,11 +8,12 @@ import React, {
 import { v4 } from "uuid";
 import debounce from "lodash/debounce";
 import { fileConfig } from "@/config/fileConfig";
-import type {
-  ExtendedFile,
-  FileSetter,
-  TError,
-  EndpointFileConfig,
+import {
+  type ExtendedFile,
+  type FileSetter,
+  type TError,
+  type EndpointFileConfig,
+  FileSources,
 } from "@/common/types";
 import { useUploadFileMutation } from "@/providers/mutations";
 import { useDelayedUploadToast } from "@/hooks/File/useDelayedUploadToast";
@@ -93,7 +94,7 @@ const useFileHandling = (params?: UseFileHandling) => {
         setTimeout(() => {
           updateFileById(data.temp_file_id as string, {
             progress: 1,
-            file_id: data._id,
+            file_id: data.file_id,
             temp_file_id: data.temp_file_id,
             filepath: data.filepath,
             type: data.type,
@@ -123,19 +124,24 @@ const useFileHandling = (params?: UseFileHandling) => {
   const startUpload = async (extendedFile: ExtendedFile) => {
     const filename = extendedFile.file?.name ?? "File";
     startUploadTimer(extendedFile.file_id, filename, extendedFile.size);
+    const width = extendedFile.width ?? 0;
+    const height = extendedFile.height ?? 0;
+    const metadata = params?.additionalMetadata ?? {};
 
     const formData = new FormData();
     formData.append("endpoint", endpoint);
+
+    // Set file storage for backend processing
+    formData.append("storage", FileSources.cloudinary);
+
     formData.append(
       "file",
-      extendedFile.file as File,
-      encodeURIComponent(filename)
+      extendedFile.file as File
+      // encodeURIComponent(filename)
     );
 
     formData.append("file_id", extendedFile.file_id);
 
-    const width = extendedFile.width ?? 0;
-    const height = extendedFile.height ?? 0;
     if (width) {
       formData.append("width", width.toString());
     }
@@ -143,7 +149,6 @@ const useFileHandling = (params?: UseFileHandling) => {
       formData.append("height", height.toString());
     }
 
-    const metadata = params?.additionalMetadata ?? {};
     if (params?.additionalMetadata) {
       for (const [key, value = ""] of Object.entries(metadata)) {
         if (value) {

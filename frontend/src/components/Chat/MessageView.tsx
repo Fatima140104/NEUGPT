@@ -13,6 +13,7 @@ import HoverButtons from "@/components/Chat/HoverButtons";
 import type { HoverButtonConfig, ExtendedFile } from "@/common/types";
 import { Check, Copy } from "lucide-react";
 import FileGallery from "@/components/Chat/Gallery/FileGallery";
+import FileList from "@/components/Chat/Files/FileList";
 
 function useCopyToClipboard() {
   const [isCopied, setIsCopied] = useState(false);
@@ -34,6 +35,11 @@ const MessageItem: React.FC<{ message: Message }> = React.memo(
     const fileObjects: ExtendedFile[] = message.files
       ? Array.from(message.files.values())
       : [];
+
+    const imageFiles = fileObjects.filter((f) => f.type?.startsWith("image"));
+    const nonImageFiles = fileObjects.filter(
+      (f) => !f.type?.startsWith("image")
+    );
 
     // Button configs
     const copyBtn: HoverButtonConfig = {
@@ -82,10 +88,17 @@ const MessageItem: React.FC<{ message: Message }> = React.memo(
     return (
       <div className="max-w-3xl mx-auto w-full flex flex-col gap-2 group">
         {isUser && fileObjects.length > 0 && (
-          <div className="flex w-full justify-end">
-            <div className="w-1/3 flex-col">
-              <FileGallery files={fileObjects} />
-            </div>
+          <div className="flex flex-col w-full items-end gap-2">
+            {imageFiles.length > 0 && (
+              <div className="w-1/3 flex-col">
+                <FileGallery files={imageFiles} />
+              </div>
+            )}
+            {nonImageFiles.length > 0 && (
+              <div className="w-1/3 flex-col">
+                <FileList files={nonImageFiles} />
+              </div>
+            )}
           </div>
         )}
         <div

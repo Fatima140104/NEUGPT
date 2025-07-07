@@ -36,13 +36,12 @@ export enum EToolResources {
 /* File */
 export enum FileSources {
   local = "local",
+  cloudinary = "cloudinary",
   firebase = "firebase",
   azure = "azure",
   azure_blob = "azure_blob",
   openai = "openai",
-  s3 = "s3",
   vectordb = "vectordb",
-  execute_code = "execute_code",
   mistral_ocr = "mistral_ocr",
   azure_mistral_ocr = "azure_mistral_ocr",
   vertexai_mistral_ocr = "vertexai_mistral_ocr",
@@ -206,6 +205,7 @@ export type BatchFile = {
   embedded: boolean;
   source: FileSources;
   temp_file_id?: string;
+  type?: string;
 };
 
 export type DeleteFilesBody = {
