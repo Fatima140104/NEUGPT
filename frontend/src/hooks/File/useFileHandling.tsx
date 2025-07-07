@@ -93,6 +93,7 @@ const useFileHandling = (params?: UseFileHandling) => {
         });
         setTimeout(() => {
           updateFileById(data.temp_file_id as string, {
+            _id: data._id,
             progress: 1,
             file_id: data.file_id,
             temp_file_id: data.temp_file_id,

@@ -40,7 +40,7 @@ export function useStreamChat() {
     const signal = abortControllerRef.current.signal;
 
     try {
-      const file_ids = Array.from(files.values()).map((f) => f.file_id);
+      const file_ids = Array.from(files.values()).map((f) => f._id);
       if (!currentSessionId || currentSessionId === "new") {
         const newSession = await addSession("Cuộc trò chuyện mới");
         if (!newSession || !newSession._id) {
