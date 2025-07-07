@@ -389,7 +389,7 @@ function ChatSidebar() {
                 <DropdownMenuItem
                   onClick={() => {
                     removeToken();
-                    navigate("/login");
+                    window.location.reload();
                   }}
                 >
                   Đăng xuất
