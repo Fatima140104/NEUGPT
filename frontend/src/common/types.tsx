@@ -243,9 +243,16 @@ export type TError = {
   };
 };
 
+export enum NotificationSeverity {
+  INFO = "info",
+  SUCCESS = "success",
+  WARNING = "warning",
+  ERROR = "error",
+}
+
 export type TShowToast = {
   message: string;
-  severity?: "success" | "error" | "warning" | "info";
+  severity?: NotificationSeverity;
   showIcon?: boolean;
   duration?: number;
   status?: "error" | "success" | "warning" | "info";

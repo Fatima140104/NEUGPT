@@ -1127,3 +1127,9 @@ body,
 .overflow-visible\! {
   overflow: visible !important;
 }
+
+.squircle {
+  --smooth-corners: 6;
+  mask-image: paint(smooth-corners);
+  -webkit-mask-image: paint(smooth-corners);
+}

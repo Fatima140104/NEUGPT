@@ -47,7 +47,7 @@ const AttachFileMenu = ({
   const dropdownItems = useMemo(() => {
     const items = [
       {
-        label: "Upload Image",
+        label: "Upload Files",
         onClick: () => {
           setToolResource(undefined);
           // Accept most common file type
@@ -87,7 +87,7 @@ const AttachFileMenu = ({
           </DropdownMenuTrigger>
           <TooltipContent>Attach files</TooltipContent>
         </Tooltip>
-        <DropdownMenuContent>
+        <DropdownMenuContent align="end">
           {dropdownItems.map((item, idx) => (
             <DropdownMenuItem key={idx} onClick={item.onClick}>
               {item.icon}

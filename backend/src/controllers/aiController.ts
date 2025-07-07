@@ -73,6 +73,21 @@ export const chatWithAI = async (req: Request, res: Response) => {
   //Extract and validate request data
   const userId = (req as any).user?.id;
   const { sessionId, message, model: requestedModel, file_ids } = req.body;
+  // Get files from database
+  const files = await File.find({ _id: { $in: file_ids } });
+
+  // Map file type to openai type
+  const fileTypeMap = {
+    image: "image_url",
+    file: "file_url",
+  };
+
+  // Map to a simple array of file info
+  const fileInfos = files.map((file) => ({
+    url: file.filepath,
+    type: fileTypeMap[file.type as keyof typeof fileTypeMap],
+    filename: file.filename,
+  }));
 
   // Validate required fields
   if (!sessionId) {
@@ -145,18 +160,30 @@ export const chatWithAI = async (req: Request, res: Response) => {
       .sort({ timestamp: 1 })
       .select("role content");
 
-    // Prepare messages for OpenAI API
-    const messages: any[] = [];
-    // Add chat history to messages
-    chatHistory.forEach((chat) => {
-      
-      const content = chat.content;
-
-      messages.push({
-        role: chat.role,
-        content: content,
-      });
+    // Build content array for the user message
+    const contentArray: any[] = [];
+    if (message) {
+      contentArray.push({ type: "text", text: message });
+    }
+    fileInfos.forEach((file) => {
+      if (file.type === "image_url") {
+        contentArray.push({ type: "image_url", image_url: { url: file.url } });
+      } else if (file.type === "file_url") {
+        contentArray.push({ type: "file", file_url: { url: file.url } });
+      }
     });
+
+    // Build the messages array in multimodal format
+    const messages = [
+      ...chatHistory.map((chat) => ({
+        role: chat.role,
+        content: [{ type: "text", text: chat.content }],
+      })),
+      {
+        role: "user",
+        content: contentArray,
+      },
+    ];
 
     // Call OpenAI API and stream response to client
     // TODO: Add toast to show error message (rate limit, etc)
@@ -164,7 +191,7 @@ export const chatWithAI = async (req: Request, res: Response) => {
     const completion = await openai.chat.completions.create(
       {
         model: selectedModel,
-        messages: messages,
+        messages: messages as any,
         stream: true,
       },
       { signal: (req as any).abortSignal }
