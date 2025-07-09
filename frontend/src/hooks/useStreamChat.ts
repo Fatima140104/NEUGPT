@@ -36,7 +36,7 @@ export function useStreamChat() {
 
     if (!message.trim() || state.isLoading || formState.filesLoading) return;
 
-    if (!selectedModel?.canProcessFiles) {
+    if (!selectedModel?.canProcessFiles && files.size > 0) {
       showToast({
         message: "Model does not support file processing",
         severity: NotificationSeverity.WARNING,

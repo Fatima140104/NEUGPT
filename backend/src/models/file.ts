@@ -11,7 +11,7 @@ export interface IMongoFile extends Omit<Document, "model"> {
   filepath: string;
   object: "file";
   embedded?: boolean;
-  type: string;
+  type: "image" | "video" | "raw" | string;
   context?: string;
   usage: number;
   source: string;
@@ -24,6 +24,8 @@ export interface IMongoFile extends Omit<Document, "model"> {
   expiresAt?: Date;
   createdAt?: Date;
   updatedAt?: Date;
+  mimetype: string;
+  local_path?: string;
 }
 
 const fileSchema = new Schema<IMongoFile>({
@@ -48,6 +50,8 @@ const fileSchema = new Schema<IMongoFile>({
   expiresAt: { type: Date, required: false },
   createdAt: { type: Date, required: true, default: Date.now },
   updatedAt: { type: Date, required: true, default: Date.now },
+  mimetype: { type: String, required: true },
+  local_path: { type: String, required: false },
 });
 
 export default model<IMongoFile>("File", fileSchema);

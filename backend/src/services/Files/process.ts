@@ -10,6 +10,12 @@ import path from "path";
 /**
  * Save an uploaded file, create a DB record, and return file info.
  */
+function mapMimeToType(mimetype: string): "image" | "video" | "raw" {
+  if (mimetype.startsWith("image/")) return "image";
+  if (mimetype.startsWith("video/")) return "video";
+  return "raw";
+}
+
 export async function processFileUpload({
   req,
   metadata,
@@ -42,8 +48,11 @@ export async function processFileUpload({
     width = dimensions?.width || uploadResult.width,
     height = dimensions?.height || uploadResult.height,
     public_id = uploadResult.public_id,
-    type = uploadResult.type || file.mimetype,
+    mimetype = file.mimetype,
+    local_path = uploadResult.local_path,
   } = uploadResult;
+
+  const type = mapMimeToType(mimetype);
 
   // Create DB record (remove 'format', 'url')
   const dbFile = await createFile(
@@ -53,8 +62,10 @@ export async function processFileUpload({
       temp_file_id: _temp_file_id,
       bytes: _bytes,
       filepath: filepath,
+      local_path: local_path,
       filename: filename,
-      type,
+      type, // platform category
+      mimetype, // always the MIME type
       width,
       height,
       object: "file",

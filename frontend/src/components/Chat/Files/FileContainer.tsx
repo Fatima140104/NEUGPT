@@ -19,8 +19,7 @@ const FileContainer = ({
   onDelete?: () => void;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
 }) => {
-  const fileType = getFileType(overrideType ?? file.type);
-
+  const fileType = getFileType(overrideType ?? file.mimetype);
   const source = file.source || "local";
   let url = file.filepath || "";
   // Path to the file on the server

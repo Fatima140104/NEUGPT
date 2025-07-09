@@ -20,14 +20,14 @@ function buildCloudinaryResponse(result: any, mimetype?: string) {
     url: result.secure_url,
     public_id: result.public_id,
     bytes: result.bytes,
-    type: result.resource_type,
+    type: category,
+    mimetype: mimetype || result.mimetype || "application/octet-stream",
     width: result.width,
     height: result.height,
     format: result.format,
     category,
     downloadUrl,
     original_filename: result.original_filename,
-    mimetype,
   };
 }
 
@@ -45,6 +45,8 @@ async function uploadCloudinaryFile({
     const ext = file.originalname ? path.extname(file.originalname) : "";
     let publicId = file_id;
     const isImage = file.mimetype.startsWith("image/");
+    const isVideo = file.mimetype.startsWith("video/");
+    const resource_type = isImage ? "image" : isVideo ? "video" : "raw";
 
     if (ext && publicId.endsWith(ext)) {
       publicId = publicId.slice(0, -ext.length);
@@ -53,12 +55,11 @@ async function uploadCloudinaryFile({
       publicId = file_id + ext;
     }
     console.log("[uploadCloudinaryFile] Uploading file:", publicId);
-    // Only set format for images
 
     const uploadOptions: any = {
       public_id: publicId,
       folder,
-      resource_type: "auto",
+      resource_type,
       use_filename: true,
       unique_filename: false,
       overwrite: true,
@@ -68,13 +69,22 @@ async function uploadCloudinaryFile({
     }
     const result = await cloudinary.uploader.upload(file.path, uploadOptions);
 
-    // Remove the multer file after upload
-    try {
-      require("fs").unlinkSync(file.path);
-    } catch (e) {
-      console.warn("[uploadCloudinaryFile] Could not remove multer file:", e);
+    // Return both Cloudinary URL and local file path for non-image files
+    const response = buildCloudinaryResponse(result, file.mimetype) as any;
+    if (!isImage) {
+      response.local_path = file.path;
+    } else {
+      // Remove the multer image file after upload
+      try {
+        require("fs").unlinkSync(file.path);
+      } catch (e) {
+        console.warn(
+          "[uploadCloudinaryFile] Could not remove multer file(image):",
+          e
+        );
+      }
     }
-    return buildCloudinaryResponse(result, file.mimetype);
+    return response;
   } catch (error) {
     console.error("[uploadCloudinaryFile] Error:", error);
     throw error;

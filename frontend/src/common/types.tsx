@@ -66,6 +66,7 @@ export interface ExtendedFile {
   embedded?: boolean;
   tool_resource?: string;
   metadata?: TFile["metadata"];
+  mimetype?: string;
 }
 
 export const checkOpenAIStorage = (source: string) =>
@@ -129,6 +130,7 @@ export type TFile = {
   object: "file";
   type: string;
   usage: number;
+  progress?: number;
   context?: FileContext;
   source?: FileSources;
   filterSource?: FileSources;
@@ -139,6 +141,7 @@ export type TFile = {
   metadata?: { fileIdentifier?: string };
   createdAt?: string | Date;
   updatedAt?: string | Date;
+  mimetype?: string;
 };
 
 export type TFileUpload = TFile & {

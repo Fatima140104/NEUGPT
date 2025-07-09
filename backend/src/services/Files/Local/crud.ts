@@ -138,9 +138,12 @@ async function saveFileFromURL({
     });
 
     const buffer = Buffer.from(response.data, "binary");
-    const { bytes, type, dimensions, extension } = await getBufferMetadata(
-      buffer
-    );
+    const {
+      bytes,
+      type: detectedMimeType,
+      dimensions,
+      extension,
+    } = await getBufferMetadata(buffer);
 
     // Construct the outputPath based on the basePath and userId
     const outputPath = path.join(paths.publicPath, basePath, userId.toString());
@@ -163,7 +166,13 @@ async function saveFileFromURL({
 
     return {
       bytes,
-      type,
+      type:
+        detectedMimeType && detectedMimeType.startsWith("image/")
+          ? "image"
+          : detectedMimeType && detectedMimeType.startsWith("video/")
+          ? "video"
+          : "raw",
+      mimetype: detectedMimeType,
       dimensions,
     };
   } catch (error) {
