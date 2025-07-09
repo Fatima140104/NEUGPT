@@ -217,6 +217,7 @@ const useFileHandling = (params?: UseFileHandling) => {
           file_id,
           file: originalFile,
           type: originalFile.type,
+          mimetype: originalFile.type, // <-- ensure mimetype is set!
           preview: initialPreview,
           progress: 0.1, // Show as processing
           size: originalFile.size,
@@ -288,6 +289,7 @@ const useFileHandling = (params?: UseFileHandling) => {
             ...initialExtendedFile,
             file: finalProcessedFile,
             type: finalProcessedFile.type,
+            mimetype: finalProcessedFile.type, // <-- ensure mimetype is set!
             preview: newPreview,
             progress: 0.5, // Processing complete, ready for upload
             size: finalProcessedFile.size,
@@ -309,6 +311,7 @@ const useFileHandling = (params?: UseFileHandling) => {
           const readyExtendedFile = {
             ...initialExtendedFile,
             progress: 0.2,
+            mimetype: initialExtendedFile.type, // <-- ensure mimetype is set!
           };
           replaceFile(readyExtendedFile);
 

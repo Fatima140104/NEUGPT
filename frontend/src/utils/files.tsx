@@ -67,6 +67,20 @@ export const fileTypes: {
   // image,
 };
 
+const partialMimeTypeMap: {
+  [key: string]: { paths: React.FC; fill: string; title: string };
+} = {
+  wordprocessingml: textDocument, // docx
+  msword: textDocument, // doc
+  pdf: textDocument, // pdf
+  spreadsheetml: spreadsheet, // xlsx
+  "ms-excel": spreadsheet, // xls
+  xml: spreadsheet, // xlsm
+  csv: spreadsheet, // csv
+  presentationml: fileTypes.file, // pptx (default file icon)
+  "ms-powerpoint": fileTypes.file, // ppt (default file icon)
+};
+
 // export const getFileType = (type = '') => {
 //   let fileType = fileTypes.file;
 //   const exactMatch = fileTypes[type];
@@ -104,10 +118,15 @@ export const getFileType = (
     return spreadsheet;
   }
 
-  // Partial match check
-  const partialMatch = partialTypes.find((partial) => type.includes(partial));
-  if (partialMatch && fileTypes[partialMatch]) {
-    return fileTypes[partialMatch];
+  if (type === "raw" || type === "application") {
+    return textDocument;
+  }
+
+  // Partial match check (new logic)
+  for (const partial in partialMimeTypeMap) {
+    if (type.toLowerCase().includes(partial)) {
+      return partialMimeTypeMap[partial];
+    }
   }
 
   // Category check
@@ -180,6 +199,11 @@ export const validateFiles = ({
       originalFile = newFile;
       fileList[i] = newFile;
     }
+
+    // Always set mimetype for upload payloads
+    // (Assume downstream code will use originalFile.type as mimetype)
+    // If you build a FormData or JSON payload, include both type and mimetype
+    // Example: formData.append('mimetype', originalFile.type);
 
     if (!checkType(originalFile.type, supportedMimeTypes)) {
       setError("Currently, unsupported file type: " + originalFile.type);

@@ -6,6 +6,8 @@ import { getAvailableModels, type AIModel } from "@/config/models";
 import { streamChat } from "@/lib/streamChat";
 import { useAuthFetch } from "@/hooks/useAuthFetch";
 import { useChatForm } from "@/providers/ChatFormContext";
+import useToast from "@/hooks/useToast";
+import { NotificationSeverity } from "@/common/types";
 
 export function useStreamChat() {
   const [message, setMessage] = useState("");
@@ -23,7 +25,7 @@ export function useStreamChat() {
   const abortControllerRef = useRef<AbortController | null>(null);
   const navigate = useNavigate();
   const authFetch = useAuthFetch();
-
+  const { showToast } = useToast();
   // Initialize selected model
   if (!selectedModel && availableModels.length > 0) {
     setSelectedModel(availableModels[0]);
@@ -31,7 +33,16 @@ export function useStreamChat() {
 
   const handleSubmit = async (e: React.FormEvent | React.KeyboardEvent) => {
     e.preventDefault();
+
     if (!message.trim() || state.isLoading || formState.filesLoading) return;
+
+    if (!selectedModel?.canProcessFiles && files.size > 0) {
+      showToast({
+        message: "Model does not support file processing",
+        severity: NotificationSeverity.WARNING,
+      });
+      return;
+    }
 
     let currentSessionId = sessionState.selectedSessionId;
     let isNewSession = false;

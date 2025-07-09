@@ -21,9 +21,7 @@ export default function FileIcon({
       height="36"
     >
       <rect width="36" height="36" rx="6" fill={fileType.fill} />
-      {"progress" in (file ?? {}) && ((file as any).progress ?? 1) >= 1 && (
-        <>{<fileType.paths />}</>
-      )}
+      {((file as any).progress ?? 1) >= 1 && <>{<fileType.paths />}</>}
     </svg>
   );
 }

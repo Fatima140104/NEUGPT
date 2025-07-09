@@ -27,7 +27,7 @@ const FileGalleryItem: React.FC<FileGalleryItemProps> = ({ file }) => {
         : `/api${file.filepath}`;
     }
     return (
-      <div className="relative w-full h-full">
+      <div className="relative w-full h-full squircle">
         {/* Skeleton Loader */}
         {!loaded && (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse z-10">
@@ -35,22 +35,29 @@ const FileGalleryItem: React.FC<FileGalleryItemProps> = ({ file }) => {
             <div className="w-full h-full bg-gray-300 dark:bg-gray-600 rounded-lg" />
           </div>
         )}
-
-        {/* Animated Image with Lazy Loading */}
-        <motion.img
-          src={url}
-          alt={file.filename}
-          className={`object-cover w-full h-full rounded-lg transition-opacity duration-300 ${
-            loaded ? "opacity-100" : "opacity-0"
-          }`}
-          loading="lazy"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={
-            loaded ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }
-          }
-          transition={{ duration: 0.4, ease: "easeOut" }}
-          onLoad={() => setLoaded(true)}
-        />
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block w-full h-full"
+          title={`Download ${file.filename}`}
+        >
+          {/* Animated Image with Lazy Loading */}
+          <motion.img
+            src={url}
+            alt={file.filename}
+            className={`object-cover w-full h-full rounded-lg transition-opacity duration-300 ${
+              loaded ? "opacity-100" : "opacity-0"
+            }`}
+            loading="lazy"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={
+              loaded ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }
+            }
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            onLoad={() => setLoaded(true)}
+          />
+        </a>
       </div>
     );
   }
