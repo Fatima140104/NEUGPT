@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
 import jwt from "jsonwebtoken";
+import config from "../config/config";
 
 export const mockAuthMiddleware: RequestHandler = (req, res, next) => {
   const authHeader = req.headers["authorization"];
@@ -15,7 +16,7 @@ export const mockAuthMiddleware: RequestHandler = (req, res, next) => {
   }
 
   const token = tokenParts[1];
-  jwt.verify(token, "dev-secret", (err, user) => {
+  jwt.verify(token, config.jwtSecret, (err, user) => {
     if (err) {
       // This will catch expired tokens, invalid signatures, etc.
       res.status(401).json({ error: "Invalid or expired token" });
