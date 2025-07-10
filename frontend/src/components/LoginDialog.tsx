@@ -51,7 +51,13 @@ function LoginDialog({ open, onOpenChange, onLoginSuccess, forceOpen = false }: 
     }
   }, [open, onOpenChange, forceOpen]);
 
-  const handleLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleMicrosoftLogin = () => {
+    setLoading(true);
+    // Redirect to backend Microsoft OAuth endpoint
+    window.location.href = "http://localhost:3000/api/auth/microsoft";
+  };
+
+  const handleMockLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setLoading(true);
     try {
@@ -87,15 +93,46 @@ function LoginDialog({ open, onOpenChange, onLoginSuccess, forceOpen = false }: 
         
         <div className="flex flex-col items-center gap-4 py-4">
           <Button 
-            onClick={handleLogin} 
+            onClick={handleMicrosoftLogin} 
             disabled={loading}
+            className="w-full bg-blue-600 hover:bg-blue-700"
+            size="lg"
+          >
+            {loading ? (
+              <LoadingSpinner loadingTitle="Đang chuyển hướng..." />
+            ) : (
+              <>
+                <svg className="w-5 h-5 mr-2" viewBox="0 0 23 23">
+                  <path fill="#F25022" d="M1 1h10v10H1z"/>
+                  <path fill="#00A4EF" d="M12 1h10v10H12z"/>
+                  <path fill="#7FBA00" d="M1 12h10v10H1z"/>
+                  <path fill="#FFB900" d="M12 12h10v10H12z"/>
+                </svg>
+                Đăng nhập với Microsoft
+              </>
+            )}
+          </Button>
+
+          <div className="relative w-full">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-muted-foreground/20" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">Hoặc</span>
+            </div>
+          </div>
+
+          <Button 
+            onClick={handleMockLogin} 
+            disabled={loading}
+            variant="outline"
             className="w-full"
             size="lg"
           >
             {loading ? (
               <LoadingSpinner loadingTitle="Đang đăng nhập..." />
             ) : (
-              "Đăng nhập"
+              "Đăng nhập Demo"
             )}
           </Button>
         </div>
