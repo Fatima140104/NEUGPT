@@ -54,7 +54,7 @@ function LoginDialog({ open, onOpenChange, onLoginSuccess, forceOpen = false }: 
   const handleMicrosoftLogin = () => {
     setLoading(true);
     // Redirect to backend Microsoft OAuth endpoint
-    window.location.href = "http://localhost:3000/api/auth/microsoft";
+    window.location.href = "/api/auth/microsoft";
   };
 
   const handleMockLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
