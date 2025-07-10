@@ -27,23 +27,24 @@ export const ChatForm: React.FC = () => {
       className="w-full flex flex-col items-center pr-4 pb-4 pt-2"
       autoComplete="off"
     >
-      {/* Hidden file input */}
-
       <div className="shadow-md border-2 border-gray-200 flex w-full max-w-3xl flex-col mx-auto items-center justify-center overflow-clip rounded-[28px] bg-background dark:bg-[#303030]">
         <div className="flex flex-col w-full">
           <FileFormChat disableInputs={isLoading} />
-          <div className="relative flex w-full items-end px-2.5 py-2.5">
+          <div className="relative flex w-full items-end px-2.5 pt-2.5">
             <div className="flex w-full flex-col">
               <div className="flex min-h-12 items-start">
                 <div className="max-w-full min-w-0 flex-1 px-2.5">
                   <Textarea
+                    id="chat-input"
                     ref={textareaRef}
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder="Hỏi gì đi"
-                    className="text-token-text-primary placeholder:text-token-text-tertiary block h-10 w-full resize-none border-0 bg-transparent px-0 py-2 ring-0 placeholder:ps-px min-h-12 max-h-52 font-family-Segoe-UI"
+                    className="text-token-text-primary placeholder:text-token-text-tertiary block w-full resize-none border-0 bg-transparent px-0 py-2 ring-0 placeholder:ps-px font-family-Segoe-UI"
                     disabled={isLoading}
+                    autoResize
+                    maxHeight={208}
                   />
                 </div>
                 {isLoading ? (
