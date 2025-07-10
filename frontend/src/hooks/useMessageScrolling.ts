@@ -40,7 +40,7 @@ export default function useMessageScrolling(
     const handleScroll = () => {
       if (!scrollableRef.current || !messagesEndRef.current) return;
       const { scrollTop, scrollHeight, clientHeight } = scrollableRef.current;
-      const atBottom = scrollHeight - scrollTop - clientHeight < 100;
+      const atBottom = scrollHeight - scrollTop - clientHeight < 30;
       setIsAtBottom(atBottom);
       setShowScrollButton(!atBottom);
     };
