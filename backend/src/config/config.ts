@@ -8,7 +8,6 @@ interface Config {
   mongoUri: string;
   openaiApiKey: string;
   frontendUrl: string;
-  backendUrl: string;
   microsoft: {
     clientId: string;
     tenantId: string;
@@ -24,7 +23,6 @@ const config: Config = {
   mongoUri: process.env.MONGODB_URI || "",
   openaiApiKey: process.env.OPENAI_API_KEY || "",
   frontendUrl: process.env.FRONTEND_URL || "",
-  backendUrl: process.env.BACKEND_URL || "",
   microsoft: {
     clientId: process.env.MICROSOFT_CLIENT_ID || "",
     tenantId: process.env.MICROSOFT_TENANT_ID || "",
