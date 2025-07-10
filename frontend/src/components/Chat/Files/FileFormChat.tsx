@@ -3,7 +3,7 @@ import useFileHandling from "@/hooks/File/useFileHandling";
 import FileRow from "@/components/Chat/Files/FileRow";
 import { useChatForm } from "@/providers/ChatFormContext";
 
-function FileFormChat({ disableInputs }: { disableInputs: boolean }) {
+function FileFormChat() {
   const { files, setFiles, setFilesLoading } = useChatForm();
   const { abortUpload } = useFileHandling();
 

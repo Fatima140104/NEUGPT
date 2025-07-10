@@ -29,7 +29,7 @@ export const ChatForm: React.FC = () => {
     >
       <div className="shadow-md border-2 border-gray-200 flex w-full max-w-3xl flex-col mx-auto items-center justify-center overflow-clip rounded-[28px] bg-background dark:bg-[#303030]">
         <div className="flex flex-col w-full">
-          <FileFormChat disableInputs={isLoading} />
+          <FileFormChat />
           <div className="relative flex w-full items-end px-2.5 pt-2.5">
             <div className="flex w-full flex-col">
               <div className="flex min-h-12 items-start">
