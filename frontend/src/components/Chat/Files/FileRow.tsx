@@ -121,7 +121,6 @@ export default function FileRow({
                     url={file.preview ?? file.filepath}
                     onDelete={handleDelete}
                     progress={file.progress}
-                    source={file.source}
                   />
                 ) : (
                   <FileContainer file={file} onDelete={handleDelete} />

@@ -34,7 +34,12 @@ export function useStreamChat() {
   const handleSubmit = async (e: React.FormEvent | React.KeyboardEvent) => {
     e.preventDefault();
 
-    if (!message.trim() || state.isLoading || formState.filesLoading) return;
+    if (
+      (!message.trim() && files.size === 0) ||
+      state.isLoading ||
+      formState.filesLoading
+    )
+      return;
 
     if (!selectedModel?.canProcessFiles && files.size > 0) {
       showToast({

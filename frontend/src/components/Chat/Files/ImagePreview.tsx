@@ -1,9 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Maximize2 } from "lucide-react";
-// import { OGDialog, OGDialogContent } from "@/components/ui";
-import { FileSources } from "@/common/types";
 import ProgressCircle from "@/components/Chat/Files/ProgressCircle";
-// import SourceIcon from "@/components/Chat/Files/SourceIcon";
 import { cn } from "@/lib/utils";
 
 type styleProps = {
@@ -23,14 +20,12 @@ const ImagePreview = ({
   url,
   progress = 1,
   className = "",
-  source,
   alt = "Preview image",
 }: {
   imageBase64?: string;
   url?: string;
   progress?: number;
   className?: string;
-  source?: FileSources;
   alt?: string;
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -161,25 +156,7 @@ const ImagePreview = ({
             />
           </div>
         )}
-        {/* <SourceIcon
-          source={source}
-          aria-label={source ? `Source: ${source}` : undefined}
-        /> */}
       </div>
-
-      {/* <OGDialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <OGDialogContent
-          showCloseButton={false}
-          className="w-11/12 overflow-x-auto bg-transparent p-0 sm:w-auto"
-          disableScroll={false}
-        >
-          <img
-            src={imageUrl}
-            alt={alt}
-            className="max-w-screen h-full max-h-screen w-full object-contain"
-          />
-        </OGDialogContent>
-      </OGDialog> */}
     </>
   );
 };
