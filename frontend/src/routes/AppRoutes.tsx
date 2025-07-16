@@ -1,20 +1,15 @@
 import { Routes, Route } from "react-router-dom";
 import Home from "@/pages/Home";
-import Login from "@/pages/Login";
-import ProtectedRoute from "./ProtectedRoute";
+import AuthSuccess from "@/pages/AuthSuccess";
 
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* Public route */}
-      <Route path="/login" element={<Login />} />
-      {/* Protected routes */}
-      <Route element={<ProtectedRoute />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/c/:sessionId" element={<Home />} />
-      </Route>
+      <Route path="/" element={<Home />} />
+      <Route path="/c/:sessionId" element={<Home />} />
+      <Route path="/auth/success" element={<AuthSuccess />} />
     </Routes>
   );
 };
 
-export default AppRoutes; 
+export default AppRoutes;

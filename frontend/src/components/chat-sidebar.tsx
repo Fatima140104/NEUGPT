@@ -96,14 +96,23 @@ function SessionTitleWithTyping({
 
 function ChatSidebar() {
   const navigate = useNavigate();
-  const { state, selectSession, deleteSession, updateSessionTitle } = useChatSession();
+  const { state, selectSession, deleteSession, updateSessionTitle } =
+    useChatSession();
   const [searchQuery, setSearchQuery] = React.useState("");
-  const [hoveredSessionId, setHoveredSessionId] = React.useState<string | null>(null);
-  const [menuOpenSessionId, setMenuOpenSessionId] = React.useState<string | null>(null);
-  const [updatedSessionId, setUpdatedSessionId] = React.useState<string | null>(null);
-  
+  const [hoveredSessionId, setHoveredSessionId] = React.useState<string | null>(
+    null
+  );
+  const [menuOpenSessionId, setMenuOpenSessionId] = React.useState<
+    string | null
+  >(null);
+  const [updatedSessionId, setUpdatedSessionId] = React.useState<string | null>(
+    null
+  );
+
   const [renameDialogOpen, setRenameDialogOpen] = React.useState(false);
-  const [renameSessionId, setRenameSessionId] = React.useState<string | null>(null);
+  const [renameSessionId, setRenameSessionId] = React.useState<string | null>(
+    null
+  );
   const [newTitle, setNewTitle] = React.useState("");
   const [isUpdating, setIsUpdating] = React.useState(false);
 
@@ -138,7 +147,7 @@ function ChatSidebar() {
 
   const handleRenameSession = async () => {
     if (!renameSessionId || !newTitle.trim() || isUpdating) return;
-    
+
     setIsUpdating(true);
     try {
       await updateSessionTitle(renameSessionId, newTitle.trim());
@@ -187,7 +196,7 @@ function ChatSidebar() {
           Cuộc trò chuyện mới
         </Button>
       </SidebarHeader>
-      <SidebarContent className="p-2">
+      <SidebarContent className="pt-0 pb-2 px-2">
         <SidebarGroup className="sticky top-0 z-10 bg-sidebar">
           <SidebarGroupContent>
             <div className="relative">
@@ -256,30 +265,40 @@ function ChatSidebar() {
                               </span>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="start">
-                              <Dialog open={renameDialogOpen} onOpenChange={setRenameDialogOpen}>
+                              <Dialog
+                                open={renameDialogOpen}
+                                onOpenChange={setRenameDialogOpen}
+                              >
                                 <DialogTrigger asChild>
                                   <DropdownMenuItem
                                     onSelect={(e) => {
                                       e.preventDefault();
-                                      handleOpenRenameDialog(session._id, session.title || "");
+                                      handleOpenRenameDialog(
+                                        session._id,
+                                        session.title || ""
+                                      );
                                     }}
                                   >
                                     <Edit3 className="h-5 w-5 mr-2" /> Đổi tên
                                   </DropdownMenuItem>
                                 </DialogTrigger>
-                                
+
                                 <DialogContent className="sm:max-w-[425px]">
                                   <DialogHeader>
-                                    <DialogTitle>Đổi tên cuộc trò chuyện</DialogTitle>
+                                    <DialogTitle>
+                                      Đổi tên cuộc trò chuyện
+                                    </DialogTitle>
                                     <DialogDescription>
                                       Nhập tên mới cho cuộc trò chuyện này.
                                     </DialogDescription>
                                   </DialogHeader>
-                                  
+
                                   <div className="grid gap-4 py-4">
                                     <Input
                                       value={newTitle}
-                                      onChange={(e) => setNewTitle(e.target.value)}
+                                      onChange={(e) =>
+                                        setNewTitle(e.target.value)
+                                      }
                                       placeholder="Tên cuộc trò chuyện..."
                                       onKeyDown={(e) => {
                                         if (e.key === "Enter" && !e.shiftKey) {
@@ -294,7 +313,7 @@ function ChatSidebar() {
                                       autoFocus
                                     />
                                   </div>
-                                  
+
                                   <DialogFooter>
                                     <Button
                                       variant="outline"
@@ -312,7 +331,7 @@ function ChatSidebar() {
                                   </DialogFooter>
                                 </DialogContent>
                               </Dialog>
-                              
+
                               <DropdownMenuSeparator />
                               <DropdownMenuItem>
                                 <Archive className="h-5 w-5 mr-2" /> Lưu trữ
@@ -370,7 +389,7 @@ function ChatSidebar() {
                 <DropdownMenuItem
                   onClick={() => {
                     removeToken();
-                    navigate("/login");
+                    window.location.reload();
                   }}
                 >
                   Đăng xuất

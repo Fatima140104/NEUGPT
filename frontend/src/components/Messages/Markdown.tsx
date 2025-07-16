@@ -1,5 +1,5 @@
 import { memo, useMemo } from "react";
-import CodeBlock from "./CodeBlock";
+import CodeBlock from "@/components/Messages/CodeBlock";
 import { CodeBlockProvider } from "@/providers/CodeBlockContext";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";

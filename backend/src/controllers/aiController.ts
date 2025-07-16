@@ -2,15 +2,18 @@ import { Request, Response } from "express";
 import Chat from "../models/chat";
 import Session from "../models/session";
 import { OpenAI } from "openai";
-import config from "../config/config";
+import dotenv from "../config/config";
 import {
   isModelValid,
   getModelById,
   getDefaultModel,
   getAvailableModels,
 } from "../config/models";
+import File from "../models/file";
+import { Types } from "mongoose";
+import fs from "fs/promises";
 
-const openai = new OpenAI({ apiKey: config.openaiApiKey });
+const openai = new OpenAI({ apiKey: dotenv.openaiApiKey });
 
 // Function để generate title từ AI
 const generateSessionTitle = async (message: string): Promise<string> => {
@@ -46,6 +49,7 @@ const generateSessionTitle = async (message: string): Promise<string> => {
 
     return title.trim();
   } catch (error) {
+    //
     console.error("Error generating session title:", error);
     // Fallback: sử dụng 30 ký tự đầu của message
     return message.length > 30 ? message.substring(0, 30) + "..." : message;
@@ -69,8 +73,24 @@ const updateSessionTitleAsync = async (
 export const chatWithAI = async (req: Request, res: Response) => {
   //Extract and validate request data
   const userId = (req as any).user?.id;
-  const sessionId = req.body.sessionId || "";
-  const { message, model: requestedModel } = req.body;
+  const { sessionId, message, model: requestedModel, file_ids } = req.body;
+  // Get files from database
+  const files = await File.find({ _id: { $in: file_ids } });
+  console.log(files);
+  // Map file type to openai type
+  const fileTypeMap = {
+    image: "image_url",
+    raw: "input_file",
+  };
+
+  // Map to a simple array of file info
+  const fileInfos = files.map((file) => ({
+    url: file.filepath,
+    type: fileTypeMap[file.type as keyof typeof fileTypeMap],
+    filename: file.filename,
+    local_path: file.local_path,
+    _id: file._id,
+  }));
 
   // Validate required fields
   if (!sessionId) {
@@ -122,12 +142,14 @@ export const chatWithAI = async (req: Request, res: Response) => {
     const existingChats = await Chat.find({ session: sessionId });
     const isFirstMessage = existingChats.length === 0;
 
+    // Save the user message
     await Chat.create({
       session: sessionId,
       user: userId,
       role: "user",
       content: message,
       timestamp: new Date(),
+      files: file_ids,
     });
 
     if (isFirstMessage) {
@@ -139,38 +161,93 @@ export const chatWithAI = async (req: Request, res: Response) => {
     // Retrieve chat history for context
     const chatHistory = await Chat.find({ session: sessionId })
       .sort({ timestamp: 1 })
-      // No need for limit, use cached context api model
-      // .limit(10)
       .select("role content");
 
-    // Prepare messages for OpenAI API
-    const messages: any[] = [];
-    // Add chat history to messages
-    chatHistory.forEach((chat) => {
-      messages.push({
-        role: chat.role,
-        content: chat.content,
-      });
-    });
-
-    // Call OpenAI API and stream response to client
-    let fullContent = "";
-    const completion = await openai.chat.completions.create(
-      {
-        model: selectedModel,
-        messages: messages,
-        stream: true,
-      },
-      { signal: (req as any).abortSignal }
-    );
-
-    for await (const chunk of completion) {
-      const content = chunk.choices?.[0]?.delta?.content || "";
-      if (content) {
-        fullContent += content;
-        res.write(`data: ${JSON.stringify(content)}\n\n`);
+    // Build content array for the user message
+    const contentArray: any[] = [];
+    if (message) {
+      contentArray.push({ type: "text", text: message });
+    }
+    // Prepare file buffers for non-image files
+    const fileBuffers: {
+      filename: string;
+      buffer: Buffer;
+      path: string;
+      dbId: any;
+    }[] = [];
+    for (const file of fileInfos) {
+      if (file.type === "image_url") {
+        contentArray.push({ type: "image_url", image_url: { url: file.url } });
+      } else if (file.type === "input_file" && file.local_path) {
+        // Read file data from disk using local_path
+        const buffer = await fs.readFile(file.local_path);
+        console.log("local_path", file.local_path);
+        fileBuffers.push({
+          filename: file.filename,
+          buffer,
+          path: file.local_path,
+          dbId: file._id,
+        });
+        console.log("fileBuffers", fileBuffers);
+        //TODO: Create assistant for uploading file to openai
+        // contentArray.push({
+        //   type: "file",
+        //   file_data: buffer.toString("base64"),
+        //   filename: file.filename,
+        // });
       }
     }
+
+    // Build the messages array in multimodal format
+    const messages = [
+      ...chatHistory.map((chat) => ({
+        role: chat.role,
+        content: [{ type: "text", text: chat.content }],
+      })),
+      {
+        role: "user",
+        content: contentArray,
+      },
+    ];
+    // Call OpenAI API and stream response to client
+    // TODO: Add toast to show error message (rate limit, etc)
+    let fullContent = "";
+    try {
+      const completion = await openai.chat.completions.create(
+        {
+          model: selectedModel,
+          messages: messages as any,
+          stream: true,
+        },
+        { signal: (req as any).abortSignal }
+      );
+      for await (const chunk of completion) {
+        const content = chunk.choices?.[0]?.delta?.content || "";
+        if (content) {
+          fullContent += content;
+          res.write(`data: ${JSON.stringify(content)}\n\n`);
+        }
+      }
+    } finally {
+      // Delete files after reading and sending to OpenAI, and remove local_path from DB
+      console.log("finally");
+      for (const { path, dbId } of fileBuffers) {
+        console.log("fileBuffers", fileBuffers);
+        if (path) {
+          try {
+            await fs.unlink(path);
+          } catch (e) {
+            /* log or ignore */
+          }
+        }
+        try {
+          await File.findByIdAndUpdate(dbId, { $unset: { local_path: "" } });
+        } catch (e) {
+          /* log or ignore */
+        }
+      }
+    }
+
     // Store assistant message after streaming is done
     await Chat.create({
       session: sessionId,
@@ -178,7 +255,9 @@ export const chatWithAI = async (req: Request, res: Response) => {
       role: "assistant",
       content: fullContent,
       timestamp: new Date(),
+      files: file_ids || [],
     });
+
     res.write("event: end\ndata: [DONE]\n\n");
     res.end();
   } catch (err: any) {
