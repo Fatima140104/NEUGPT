@@ -179,22 +179,6 @@ export const chatWithAI = async (req: Request, res: Response) => {
       if (file.type === "image_url") {
         contentArray.push({ type: "image_url", image_url: { url: file.url } });
       } else if (file.type === "input_file" && file.local_path) {
-        // Read file data from disk using local_path
-        const buffer = await fs.readFile(file.local_path);
-        console.log("local_path", file.local_path);
-        fileBuffers.push({
-          filename: file.filename,
-          buffer,
-          path: file.local_path,
-          dbId: file._id,
-        });
-        console.log("fileBuffers", fileBuffers);
-        //TODO: Create assistant for uploading file to openai
-        // contentArray.push({
-        //   type: "file",
-        //   file_data: buffer.toString("base64"),
-        //   filename: file.filename,
-        // });
       }
     }
 

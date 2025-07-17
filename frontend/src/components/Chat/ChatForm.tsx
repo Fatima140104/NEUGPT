@@ -41,7 +41,7 @@ export const ChatForm: React.FC = () => {
                     onChange={(e) => setMessage(e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder="Hỏi gì đi"
-                    className="text-token-text-primary placeholder:text-token-text-tertiary block w-full resize-none border-0 bg-transparent px-0 py-2 ring-0 placeholder:ps-px font-family-Segoe-UI"
+                    className="text-base font-sans placeholder:text-base placeholder:font-sans placeholder:leading-[1.75] block w-full resize-none border-0 bg-transparent px-0 py-2 ring-0 placeholder:ps-px"
                     disabled={isLoading}
                     autoResize
                     maxHeight={208}
