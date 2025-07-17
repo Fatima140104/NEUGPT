@@ -10,8 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { cn } from "@/lib/utils";
-import { setToken, getToken } from "@/lib/auth";
-import { useChatSession } from "@/providers/ChatSessionContext";
+import { getToken } from "@/lib/auth";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 interface LoginDialogProps {
@@ -41,8 +40,7 @@ const DialogContentWithoutClose = React.forwardRef<
 ));
 DialogContentWithoutClose.displayName = "DialogContentWithoutClose";
 
-function LoginDialog({ open, onOpenChange, onLoginSuccess, forceOpen = false }: LoginDialogProps) {
-  const { fetchSessions } = useChatSession();
+function LoginDialog({ open, onOpenChange, forceOpen = false }: LoginDialogProps) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -55,23 +53,6 @@ function LoginDialog({ open, onOpenChange, onLoginSuccess, forceOpen = false }: 
     setLoading(true);
     // Redirect to backend Microsoft OAuth endpoint
     window.location.href = "/api/auth/microsoft";
-  };
-
-  const handleMockLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const res = await fetch("/api/mock-login", { method: "POST" });
-      const data = await res.json();
-      setToken(data.token);
-      await fetchSessions();
-      onOpenChange(false);
-      onLoginSuccess?.();
-    } catch (err) {
-      console.error("Login failed:", err);
-    } finally {
-      setLoading(false);
-    }
   };
 
   const handleOpenChange = (newOpen: boolean) => {
@@ -112,33 +93,10 @@ function LoginDialog({ open, onOpenChange, onLoginSuccess, forceOpen = false }: 
               </>
             )}
           </Button>
-
-          <div className="relative w-full">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-muted-foreground/20" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Hoặc</span>
-            </div>
-          </div>
-
-          <Button 
-            onClick={handleMockLogin} 
-            disabled={loading}
-            variant="outline"
-            className="w-full"
-            size="lg"
-          >
-            {loading ? (
-              <LoadingSpinner loadingTitle="Đang đăng nhập..." />
-            ) : (
-              "Đăng nhập Demo"
-            )}
-          </Button>
         </div>
       </DialogContentWithoutClose>
     </Dialog>
   );
 }
 
-export default LoginDialog; 
+export default LoginDialog;
