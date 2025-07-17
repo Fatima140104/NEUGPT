@@ -23,6 +23,7 @@ api.interceptors.response.use(
   (error) => {
     if (error.response && error.response.status === 401) {
       removeToken();
+      window.dispatchEvent(new CustomEvent('auth-error', { detail: { status: 401 } }));
     }
     return Promise.reject(error);
   }
