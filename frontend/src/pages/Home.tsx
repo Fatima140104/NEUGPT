@@ -26,6 +26,18 @@ function Home() {
   }, []);
 
   useEffect(() => {
+    const handleAuthError = () => {
+      setIsAuthenticated(false);
+      setShowLoginDialog(true);
+    };
+
+    window.addEventListener('auth-error', handleAuthError);
+    return () => {
+      window.removeEventListener('auth-error', handleAuthError);
+    };
+  }, []);
+
+  useEffect(() => {
     if (getToken()) {
       fetchSessions();
     }
