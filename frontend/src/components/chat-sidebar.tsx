@@ -219,11 +219,11 @@ function ChatSidebar() {
                   Đang tải...
                 </div>
               )}
-              {state.error && (
+              {/* {state.error && (
                 <div className="p-4 text-center text-red-500">
                   {state.error}
                 </div>
-              )}
+              )} */}
               {filteredSessions.map((session) => (
                 <SidebarMenuItem
                   key={session._id}
