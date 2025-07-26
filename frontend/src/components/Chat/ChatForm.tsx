@@ -1,4 +1,4 @@
-import React, { useRef, useCallback } from "react";
+import React, { useRef, useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Mic, AudioLines } from "lucide-react";
@@ -14,6 +14,7 @@ import { useSpeechInput } from "@/hooks/useSpeechInput";
 export const ChatForm: React.FC = () => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { showToast } = useToast();
+  const [originalMessage, setOriginalMessage] = useState<string>('');
   
   const {
     message,
@@ -27,22 +28,41 @@ export const ChatForm: React.FC = () => {
     availableModels,
   } = useStreamChat();
 
-  // Handle transcript from speech recognition
-  const handleTranscript = useCallback((transcript: string) => {
-    setMessage(prev => prev + (prev ? ' ' : '') + transcript);
-  }, [setMessage]);
+  const handleTranscript = useCallback((transcript: string, isFinal: boolean) => {
+    if (isFinal) {
+      const newMessage = originalMessage + (originalMessage ? ' ' : '') + transcript;
+      setMessage(newMessage);
+      setOriginalMessage(newMessage);
+    } else {
+      const interimMessage = originalMessage + (originalMessage ? ' ' : '') + transcript;
+      setMessage(interimMessage);
+    }
+  }, [originalMessage, setMessage]);
 
-  // Use speech input hook
   const { listening, toggleListening } = useSpeechInput({
     onTranscript: handleTranscript
   });
+
+  const handleManualChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    if (!listening) {
+      const newValue = e.target.value;
+      setMessage(newValue);
+      setOriginalMessage(newValue);
+    }
+  };
+
+  const handleMicToggle = () => {
+    if (!listening) {
+      setOriginalMessage(message);
+    }
+    toggleListening();
+  };
 
   const handleAudioLinesClick = () => {
     showToast({
       message: "Tính năng đang phát triển!",
       severity: NotificationSeverity.INFO,
       duration: 3000,
-      showIcon: false,
     });
   };
 
@@ -62,10 +82,12 @@ export const ChatForm: React.FC = () => {
                     id="chat-input"
                     ref={textareaRef}
                     value={message}
-                    onChange={(e) => setMessage(e.target.value)}
+                    onChange={handleManualChange}
                     onKeyDown={handleKeyDown}
                     placeholder="Hỏi gì đi"
-                    className="text-base font-sans placeholder:text-base placeholder:font-sans placeholder:leading-[1.75] block w-full resize-none border-0 bg-transparent px-0 py-2 ring-0 placeholder:ps-px"
+                    className={`text-base font-sans placeholder:text-base placeholder:font-sans placeholder:leading-[1.75] block w-full resize-none border-0 bg-transparent px-0 py-2 ring-0 placeholder:ps-px ${
+                      listening ? 'opacity-75' : ''
+                    }`}
                     disabled={isLoading}
                     autoResize
                     maxHeight={208}
@@ -85,7 +107,7 @@ export const ChatForm: React.FC = () => {
               <ErrorMessage error={error} />
             </div>
           </div>
-          {/* Tools/Actions Section */}
+
           <div className="flex w-full items-center px-4 pb-2 pt-1 gap-2 justify-between">
             <div className="flex gap-1">
               <div className="relative group">
@@ -119,7 +141,7 @@ export const ChatForm: React.FC = () => {
                       ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse' 
                       : 'hover:bg-gray-100'
                   }`}
-                  onClick={toggleListening}
+                  onClick={handleMicToggle}
                 >
                   <Mic className={`h-5 w-5 ${listening ? 'text-white' : ''}`} />
                 </Button>
