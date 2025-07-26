@@ -4,11 +4,11 @@ import * as React from "react";
 import {
   Plus,
   Search,
-  Settings,
+  // Settings,
   User,
   Edit3,
   Trash2,
-  Archive,
+  // Archive,
   // Share,
   MoreVertical,
 } from "lucide-react";
@@ -333,9 +333,9 @@ function ChatSidebar() {
                               </Dialog>
 
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem>
-                                <Archive className="h-5 w-5 mr-2" /> Lưu trữ
-                              </DropdownMenuItem>
+                                {/* <DropdownMenuItem>
+                                  <Archive className="h-5 w-5 mr-2" /> Lưu trữ
+                                </DropdownMenuItem> */}
                               <DropdownMenuItem
                                 onClick={() => handleDelete(session._id)}
                               >
@@ -377,7 +377,7 @@ function ChatSidebar() {
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-56">
-                <DropdownMenuItem>
+                {/* <DropdownMenuItem>
                   <User className="h-4 w-4 mr-2" />
                   Hồ sơ
                 </DropdownMenuItem>
@@ -385,7 +385,7 @@ function ChatSidebar() {
                   <Settings className="h-4 w-4 mr-2" />
                   Cài đặt
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
+                <DropdownMenuSeparator /> */}
                 <DropdownMenuItem
                   onClick={() => {
                     removeToken();
