@@ -4,11 +4,11 @@ import * as React from "react";
 import {
   Plus,
   Search,
-  Settings,
+  // Settings,
   User,
   Edit3,
   Trash2,
-  Archive,
+  // Archive,
   // Share,
   MoreVertical,
 } from "lucide-react";
