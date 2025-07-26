@@ -91,7 +91,7 @@ export function useStreamChat() {
         timestamp: new Date(),
       };
       dispatch({ type: "ADD_MESSAGE", payload: assistantMessage });
-
+      dispatch({ type: "SET_LOADING", payload: true });
       // Stream chat
       await streamChat({
         url: "/api/ai/chat",
@@ -111,11 +111,11 @@ export function useStreamChat() {
           dispatch({ type: "SET_MESSAGES", payload: updatedMessages });
         },
         onDone: () => {
-          // dispatch({ type: "SET_LOADING", payload: false });
+          dispatch({ type: "SET_LOADING", payload: false });
         },
         onError: (err) => {
           console.error("Streaming error: " + (err?.message || err));
-          // dispatch({ type: "SET_LOADING", payload: false });
+          dispatch({ type: "SET_LOADING", payload: false });
         },
         signal,
       });
